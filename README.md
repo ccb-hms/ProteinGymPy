@@ -1,15 +1,21 @@
 # Overview
-Short description of what the software is and does
+hopes and dreams
 
 # Installation
-To install the software, clone the repository and run `pip install -r requirements.txt`.
-To run the software, run `python main.py`
+To install the software,We reccomend using [uv](https://docs.astral.sh/uv/#installation) for python management:
 
-# Examples
-Insert an example
+```
+uv sync
+uv pip install -e .
+source .venv/bin/activate
+```
+To run the software, run `python main.py`
 
 # Usage
 Arguments, details, etc.
+
+# Examples
+Insert an example here
 
 # Contact
 ## Upkeep
