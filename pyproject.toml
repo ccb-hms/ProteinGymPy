@@ -3,14 +3,17 @@ name = "pyproteingym"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "Tyrone Lee", email = "tyrone_lee@hms.harvard.edu" }
+]
 requires-python = ">=3.13"
 dependencies = [
-    "matplotlib>=3.10.3",
-    "numpy>=2.3.1",
-    "pandas>=2.3.1",
+    "requests>=2.32.4",
 ]
 
-[tool.uv.workspace]
-members = [
-    "ProteinGymPy",
-]
+[project.scripts]
+pyproteingym = "pyproteingym:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
