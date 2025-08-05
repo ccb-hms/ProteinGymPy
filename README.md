@@ -2,12 +2,12 @@
 hopes and dreams
 
 # Installation
-To install the software,We reccomend using [uv](https://docs.astral.sh/uv/#installation) for python management:
+To install the software, we recommend using [uv](https://docs.astral.sh/uv/#installation) for python management:
 
 ```
-uv sync
-uv pip install -e .
-source .venv/bin/activate
+uv venv --python=3.13  #create a venv
+source .venv/bin/activate 
+uv pip install git+https://github.com/ccb-hms/ProteinGymPy.git#egg=ProteinGymPy
 ```
 To run the software, run `python main.py`
 
