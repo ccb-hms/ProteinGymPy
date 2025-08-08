@@ -1,7 +1,7 @@
 [project]
 name = "ProteinGymPy"
 version = "0.1.0"
-description = "<todo> @tram-nguyen-n add description here"
+description = "Programmatic access to ProteinGym datasets with visualization tools."
 readme = "README.md"
 authors = [
     { name = "Tyrone Lee", email = "tyrone_lee@hms.harvard.edu" },
