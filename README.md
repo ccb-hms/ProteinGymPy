@@ -91,10 +91,11 @@ source .venv/bin/activate
 python -m pytest tests/ -v
 ```
 
-Or run tests directly:
+Or run specific test files:
 ```bash
 source .venv/bin/activate  
 python tests/test_data_pipelines.py
+python tests/test_basic.py
 ```
 
 The tests include:
