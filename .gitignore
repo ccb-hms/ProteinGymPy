@@ -168,3 +168,7 @@ cython_debug/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+#ai helper stuff
+CLAUDE.md
+rscripts/
