@@ -1,6 +1,6 @@
 import sys
 import os
-from src.pyproteingym import get_dms_substitution_zip
+from src.proteingympy import get_dms_substitution_zip
 
 def main():
     cache_dir = ".cache"

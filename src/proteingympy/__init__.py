@@ -29,7 +29,7 @@ __all__ = [
 
 
 def main() -> None:
-    print("Hello from pyproteingym!")
+    print("Hello from proteingympy!")
     print("Available data pipeline functions:")
     print("  - get_dms_substitution_data(): Load 217 DMS substitution assays")
     print("  - get_alphamissense_proteingym_data(): Load AlphaMissense pathogenicity scores")

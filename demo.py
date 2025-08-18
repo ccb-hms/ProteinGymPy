@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple demonstration of pyProteinGym functionality.
+Simple demonstration of proteinGymPy functionality.
 
 This shows the basic functions without downloading large datasets.
 """
@@ -9,14 +9,14 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from pyproteingym import (
+from proteingympy import (
     get_supervised_model_list,
     get_zero_shot_model_list,
     create_complete_metadata_table
 )
 
 def main():
-    print("🧬 pyProteinGym Demo")
+    print("🧬 ProteinGymPy Demo")
     print("=" * 50)
     
     # Show available models

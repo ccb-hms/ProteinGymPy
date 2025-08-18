@@ -13,10 +13,11 @@ dependencies = [
     "requests>=2.32.4",
     "pandas>=2.0.0",
     "numpy>=1.24.0",
+    "matplotlib>=3.10.5",
 ]
 
 [project.scripts]
-ProteinGymPy = "ProteinGymPy:main"
+proteingympy = "proteingympy:main"
 
 [build-system]
 requires = ["hatchling"]

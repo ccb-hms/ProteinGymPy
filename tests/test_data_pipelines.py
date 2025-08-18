@@ -16,7 +16,7 @@ import sys
 # Add src to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from pyproteingym import (
+from proteingympy import (
     get_dms_substitution_data,
     get_dms_metadata,
     get_alphamissense_proteingym_data,
@@ -118,8 +118,8 @@ class TestDataPipelines(unittest.TestCase):
         self.assertEqual(stats['unique_proteins'], 2)
         self.assertAlmostEqual(stats['alphamissense_mean'], 0.4, places=2)
     
-    @patch('pyproteingym.make_dms_substitutions.requests.get')
-    @patch('pyproteingym.make_dms_substitutions.zipfile.ZipFile')
+    @patch('proteingympy.make_dms_substitutions.requests.get')
+    @patch('proteingympy.make_dms_substitutions.zipfile.ZipFile')
     def test_get_dms_substitution_data_cached(self, mock_zipfile, mock_requests):
         """Test DMS data loading with cached file."""
         # Create a fake zip file
@@ -204,7 +204,7 @@ class TestDataPipelines(unittest.TestCase):
         self.assertIsInstance(top_models, pd.Series)
         self.assertEqual(len(top_models), 0)
     
-    @patch('pyproteingym.make_supervised_scores.zipfile.ZipFile')
+    @patch('proteingympy.make_supervised_scores.zipfile.ZipFile')
     def test_get_supervised_scores_data_structure(self, mock_zipfile):
         """Test supervised scores data structure without actual download."""
         # Mock zipfile to return empty results for now
@@ -222,7 +222,7 @@ class TestDataPipelines(unittest.TestCase):
         with self.assertRaises(ValueError):
             get_supervised_scores_data("invalid_fold", cache_dir=self.cache_dir)
     
-    @patch('pyproteingym.make_alphamissense_supplementary.requests.get')
+    @patch('proteingympy.make_alphamissense_supplementary.requests.get')
     def test_get_alphamissense_proteingym_data_download_error(self, mock_requests):
         """Test AlphaMissense data download error handling."""
         # Mock failed request

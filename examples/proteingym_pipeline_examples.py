@@ -18,7 +18,7 @@ import os
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from pyproteingym import (
+from proteingympy import (
     get_dms_substitution_data,
     get_dms_metadata, 
     get_alphamissense_proteingym_data,
@@ -225,7 +225,7 @@ def main():
     print("Summary")
     print("=" * 60)
     print()
-    print("All functions are available through: from pyproteingym import <function_name>")
+    print("All functions are available through: from proteingympy import <function_name>")
     print()
     print("Note: To actually download data, ensure you have proper URLs and network access.")
     print("The current implementations include placeholder URLs that would need to be updated")
