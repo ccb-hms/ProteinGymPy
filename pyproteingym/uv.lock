@@ -60,7 +60,7 @@ wheels = [
 ]
 
 [[package]]
-name = "proteingympy"
+name = "pyproteingym"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
