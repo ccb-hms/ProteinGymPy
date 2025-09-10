@@ -13,7 +13,7 @@ import tempfile
 import zipfile
 
 
-def get_dms_substitution_data(cache_dir: str = ".cache") -> Dict[str, pd.DataFrame]:
+def get_dms_substitution_data(cache_dir: str = ".cache", use_cache: bool = True) -> Dict[str, pd.DataFrame]:
     """
     Download and process ProteinGym DMS substitution data.
     
@@ -27,6 +27,7 @@ def get_dms_substitution_data(cache_dir: str = ".cache") -> Dict[str, pd.DataFra
     
     Args:
         cache_dir: Directory to cache downloaded files
+        use_cache: If True, use cached file if it exists. If False, force a fresh download.
         
     Returns:
         Dictionary mapping DMS study names to DataFrames
@@ -34,8 +35,10 @@ def get_dms_substitution_data(cache_dir: str = ".cache") -> Dict[str, pd.DataFra
     os.makedirs(cache_dir, exist_ok=True)
     zip_path = os.path.join(cache_dir, "DMS_ProteinGym_substitutions.zip")
     
-    # Download if not cached
-    if not os.path.exists(zip_path):
+    # Download if not cached or if use_cache is False
+    if not use_cache or not os.path.exists(zip_path):
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
         url = "https://zenodo.org/records/15293562/files/DMS_ProteinGym_substitutions.zip"
         print(f"Downloading {url} to {zip_path}...")
         response = requests.get(url, stream=True)
@@ -45,6 +48,8 @@ def get_dms_substitution_data(cache_dir: str = ".cache") -> Dict[str, pd.DataFra
                 if chunk:
                     f.write(chunk)
         print("Download complete.")
+    else:
+        print(f"Using cached file at {zip_path}.")
     
     # Extract and load data
     progym_tables = {}
