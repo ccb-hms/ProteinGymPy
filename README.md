@@ -20,7 +20,7 @@ uv pip install git+https://github.com/ccb-hms/ProteinGymPy.git#egg=ProteinGymPy
 
 Load DMS substitution data (217 assays):
 ```python
-from pyproteingym import get_dms_substitution_data
+from proteingympy import get_dms_substitution_data
 
 # Load all DMS assays with UniProt IDs  
 dms_data = get_dms_substitution_data()
