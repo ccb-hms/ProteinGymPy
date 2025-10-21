@@ -8,6 +8,9 @@ from .make_supervised_scores import get_supervised_scores_data, get_supervised_m
 from .make_zero_shot_substitutions import get_zero_shot_scores_data, get_zero_shot_model_list
 from .make_zeroshot_dms_benchmarks import get_zero_shot_benchmark_data, get_benchmark_summary_stats, get_top_models_by_metric
 
+# Import visualization functions
+from .plot_dms_heatmap import plot_dms_heatmap
+
 # For convenience, expose the most commonly used functions
 __all__ = [
     'get_dms_substitution_zip',  # Original function
@@ -24,6 +27,7 @@ __all__ = [
     'get_top_models_by_metric',
     'create_complete_metadata_table',
     'save_metadata_csv',
+    'plot_dms_heatmap',
     'main'
 ]
 
@@ -38,3 +42,5 @@ def main() -> None:
     print("  - get_zero_shot_benchmark_data(): Load benchmarking metrics")
     print("  - get_dms_metadata(): Load DMS assay metadata")
     print("  - create_complete_metadata_table(): Generate dataset metadata")
+    print("\nAvailable visualization functions:")
+    print("  - plot_dms_heatmap(): Visualize DMS scores along a protein")
