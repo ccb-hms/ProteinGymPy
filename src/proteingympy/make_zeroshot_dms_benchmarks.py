@@ -10,7 +10,7 @@ import pandas as pd
 import requests
 import tempfile
 import zipfile
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 import numpy as np
 
 
@@ -234,7 +234,7 @@ def _standardize_model_names(score_list: Dict[str, pd.DataFrame]) -> Dict[str, p
     return standardized_list
 
 
-def get_benchmark_summary_stats(score_list: Dict[str, pd.DataFrame]) -> Dict[str, any]:
+def get_benchmark_summary_stats(score_list: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
     """
     Generate summary statistics for benchmark data.
     

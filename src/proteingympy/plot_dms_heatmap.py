@@ -7,6 +7,8 @@ Visualize DMS scores along a protein as a heatmap.
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 
@@ -155,7 +157,7 @@ def plot_dms_heatmap(
     color_scheme: str = "default",
     figsize: Tuple[float, float] = (12, 8),
     **kwargs
-) -> Tuple[plt.Figure, plt.Axes]:
+) -> Tuple[Figure, Axes]:
     """
     Visualize DMS scores along a protein.
     
