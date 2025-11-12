@@ -14,6 +14,12 @@ source .venv/bin/activate
 uv pip install git+https://github.com/ccb-hms/ProteinGymPy.git#egg=ProteinGymPy
 ```
 
+Addtional packages are required for jupyter notebook visualization functions:
+
+```
+uv pip install git+https://github.com/ccb-hms/ProteinGymPy.git#egg=ProteinGymPy[visualizations]
+```
+
 # Usage
 
 ## Quick Start
