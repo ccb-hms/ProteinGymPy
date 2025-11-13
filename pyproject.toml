@@ -14,10 +14,18 @@ dependencies = [
     "pandas>=2.0.0",
     "numpy>=1.24.0",
     "matplotlib>=3.10.5",
+    "seaborn>=0.13.2",
 ]
 
 [project.scripts]
 proteingympy = "proteingympy:main"
+
+[project.optional-dependencies]
+visualization = [
+    "biopython>=1.86",
+    "nglview>=3.1.4",
+    "scipy>=1.16.2",
+]
 
 [build-system]
 requires = ["hatchling"]

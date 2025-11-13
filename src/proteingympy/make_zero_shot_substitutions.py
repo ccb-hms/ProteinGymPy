@@ -9,7 +9,7 @@ import pandas as pd
 import requests
 import tempfile
 import zipfile
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 import re
 
 
@@ -243,7 +243,7 @@ def filter_zero_shot_by_models(
     return filtered_tables
 
 
-def get_zero_shot_summary_stats(zeroshot_tables: Dict[str, pd.DataFrame]) -> Dict[str, any]:
+def get_zero_shot_summary_stats(zeroshot_tables: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
     """
     Generate summary statistics for zero-shot data.
     
