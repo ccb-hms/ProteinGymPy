@@ -57,7 +57,7 @@ class TestModelCorrPlot(unittest.TestCase):
         )
 
         self.assertEqual(len(filtered), 3)
-        self.assertTrue('UniProt_id' in filtered.columns)
+        self.assertIn('UniProt_id', filtered.columns)
         self.assertTrue('mutant' in filtered.columns)
 
     def test_filter_alphamissense_table_not_found(self):
