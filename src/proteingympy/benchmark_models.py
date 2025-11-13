@@ -53,92 +53,63 @@ except Exception as e:
     ) from e
 
 
-def available_models() -> List[str]:
-    return [
-        "Site_Independent",
-        "EVmutation",
-        "DeepSequence_single",
-        "DeepSequence_ensemble",
-        "EVE_single",
-        "EVE_ensemble",
-        "Unirep",
-        "Unirep_evotune",
-        "MSA_Transformer_single",
-        "MSA_Transformer_ensemble",
-        "ESM1b",
-        "ESM1v_single",
-        "ESM1v_ensemble",
-        "ESM2_8M",
-        "ESM2_35M",
-        "ESM2_150M",
-        "ESM2_650M",
-        "ESM2_3B",
-        "ESM2_15B",
-        "Wavenet",
-        "RITA_s",
-        "RITA_m",
-        "RITA_l",
-        "RITA_xl",
-        "Progen2_small",
-        "Progen2_medium",
-        "Progen2_base",
-        "Progen2_large",
-        "Progen2_xlarge",
-        "GEMME",
-        "VESPA",
-        "VESPAl",
-        "VespaG",
-        "ProtGPT2",
-        "Tranception_S_no_retrieval",
-        "Tranception_M_no_retrieval",
-        "Tranception_L_no_retrieval",
-        "Tranception_S",
-        "Tranception_M",
-        "Tranception_L",
-        "TranceptEVE_S",
-        "TranceptEVE_M",
-        "TranceptEVE_L",
-        "CARP_38M",
-        "CARP_600K",
-        "CARP_640M",
-        "CARP_76M",
-        "MIF",
-        "MIFST",
-        "ESM_IF1",
-        "ProteinMPNN",
-        "ProtSSN_k10_h512",
-        "ProtSSN_k10_h768",
-        "ProtSSN_k10_h1280",
-        "ProtSSN_k20_h512",
-        "ProtSSN_k20_h768",
-        "ProtSSN_k20_h1280",
-        "ProtSSN_k30_h512",
-        "ProtSSN_k30_h768",
-        "ProtSSN_k30_h1280",
-        "ProtSSN_ensemble",
-        "SaProt_650M_AF2",
-        "SaProt_35M_AF2",
-        "PoET",
-        "MULAN_small",
-        "ProSST_20",
-        "ProSST_128",
-        "ProSST_512",
-        "ProSST_1024",
-        "ProSST_2048",
-        "ProSST_4096",
-        "ESCOTT",
-        "VenusREM",
-        "RSALOR",
-        "S2F",
-        "S2F_MSA",
-        "S3F",
-        "S3F_MSA",
-        "SiteRM",
+def available_models():
+    """
+    Returns a list of available model names for users to choose from.
+    Equivalent to the R function `available_models()`.
+    """
+    models = [
+        "Site_Independent", "EVmutation",
+        "DeepSequence_single", "DeepSequence_ensemble",
+        "EVE_single", "EVE_ensemble",
+        "Unirep", "Unirep_evotune",
+        "MSA_Transformer_single", "MSA_Transformer_ensemble",
+        "ESM1b", "ESM1v_single",
+        "ESM1v_ensemble", "ESM2_8M",
+        "ESM2_35M", "ESM2_150M",
+        "ESM2_650M", "ESM2_3B",
+        "ESM2_15B", "Wavenet",
+        "RITA_s", "RITA_m",
+        "RITA_l", "RITA_xl",
+        "Progen2_small", "Progen2_medium",
+        "Progen2_base", "Progen2_large",
+        "Progen2_xlarge", "GEMME",
+        "VESPA", "VESPAl",
+        "VespaG", "ProtGPT2",
+        "Tranception_S_no_retrieval", "Tranception_M_no_retrieval",
+        "Tranception_L_no_retrieval", "Tranception_S",
+        "Tranception_M", "Tranception_L",
+        "TranceptEVE_S", "TranceptEVE_M",
+        "TranceptEVE_L", "CARP_38M",
+        "CARP_600K", "CARP_640M",
+        "CARP_76M", "MIF",
+        "MIFST", "ESM_IF1",
+        "ProteinMPNN", "ProtSSN_k10_h512",
+        "ProtSSN_k10_h768", "ProtSSN_k10_h1280",
+        "ProtSSN_k20_h512", "ProtSSN_k20_h768",
+        "ProtSSN_k20_h1280", "ProtSSN_k30_h512",
+        "ProtSSN_k30_h768", "ProtSSN_k30_h1280",
+        "ProtSSN_ensemble", "SaProt_650M_AF2",
+        "SaProt_35M_AF2", "PoET",
+        "MULAN_small", "ProSST_20",
+        "ProSST_128", "ProSST_512",
+        "ProSST_1024", "ProSST_2048",
+        "ProSST_4096", "ESCOTT",
+        "VenusREM", "RSALOR",
+        "S2F", "S2F_MSA",
+        "S3F", "S3F_MSA",
+        "SiteRM"
     ]
+    return models
 
 
-def supervised_available_models() -> List[str]:
-    return [
+
+def supervised_available_models():
+    """
+    Returns a list of available supervised model names for users to choose from.
+    Equivalent to the R function `supervised_available_models()`.
+    """
+    smodels = [
         "OHE_Notaugmented",
         "normalized_targets",
         "OHE_Augmented_DeepSequence",
@@ -152,6 +123,7 @@ def supervised_available_models() -> List[str]:
         "ProteinNPT",
         "Kermut",
     ]
+    return smodels
 
 
 def check_metric_argument(user_metric: List[str]) -> None:
