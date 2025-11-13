@@ -40,7 +40,7 @@ print(df.head())
 
 Load other datasets:
 ```python
-from pyproteingym import (
+from proteingympy import (
     get_alphamissense_proteingym_data,
     get_zero_shot_benchmark_data,
     get_supervised_scores_data
