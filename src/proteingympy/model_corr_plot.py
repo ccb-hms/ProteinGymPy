@@ -5,7 +5,6 @@ Compare prediction scores for ProteinGym models using Spearman correlation
 and visualization with matplotlib/seaborn.
 """
 
-import warnings
 from typing import Optional, Tuple, Dict
 import pandas as pd
 import numpy as np
