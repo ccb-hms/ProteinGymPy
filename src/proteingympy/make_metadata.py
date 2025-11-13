@@ -26,9 +26,9 @@ class DatasetMetadata:
     coordinate_1_based: bool
     data_provider: str
     maintainer: str
-    rdata_class: str
+    data_class: str
     dispatch_class: str
-    rdata_path: str
+    data_path: str
 
 
 def create_alphamissense_metadata() -> DatasetMetadata:
@@ -45,10 +45,10 @@ def create_alphamissense_metadata() -> DatasetMetadata:
         taxonomy_id=None,
         coordinate_1_based=True,
         data_provider="Cheng et al. 2023",
-        maintainer="pyProteinGym Package <noreply@example.com>",
-        rdata_class="DataFrame",
+        maintainer="ProteinGymPy Package <noreply@example.com>",
+        data_class="DataFrame",
         dispatch_class="CSV",
-        rdata_path="pyProteinGym/cheng_proteingym_variants.csv"
+        data_path="ProteinGymPy/cheng_proteingym_variants.csv"
     )
 
 
@@ -66,10 +66,10 @@ def create_dms_substitutions_metadata() -> DatasetMetadata:
         taxonomy_id=None,
         coordinate_1_based=True,
         data_provider="Marks Lab at Harvard Medical School",
-        maintainer="pyProteinGym Package <noreply@example.com>",
-        rdata_class="Dict",
+        maintainer="ProteinGymPy Package <noreply@example.com>",
+        data_class="Dict",
         dispatch_class="Pickle",
-        rdata_path="pyProteinGym/progym217_dms_subs_v1_1.pkl"
+        data_path="ProteinGymPy/progym217_dms_subs_v1_1.pkl"
     )
 
 
@@ -87,10 +87,10 @@ def create_dms_reference_metadata() -> DatasetMetadata:
         taxonomy_id=None,
         coordinate_1_based=True,
         data_provider="Marks Lab at Harvard Medical School",
-        maintainer="pyProteinGym Package <noreply@example.com>",
-        rdata_class="DataFrame",
+        maintainer="ProteinGymPy Package <noreply@example.com>",
+        data_class="DataFrame",
         dispatch_class="CSV",
-        rdata_path="pyProteinGym/ref_file_217_dms_subs_v1_1.csv"
+        data_path="ProteinGymPy/ref_file_217_dms_subs_v1_1.csv"
     )
 
 
@@ -108,10 +108,10 @@ def create_zeroshot_scores_metadata() -> DatasetMetadata:
         taxonomy_id=None,
         coordinate_1_based=True,
         data_provider="Marks Lab at Harvard Medical School",
-        maintainer="pyProteinGym Package <noreply@example.com>",
-        rdata_class="Dict",
+        maintainer="ProteinGymPy Package <noreply@example.com>",
+        data_class="Dict",
         dispatch_class="Pickle",
-        rdata_path="pyProteinGym/zeroshot_dms_subs_v1_1.pkl"
+        data_path="ProteinGymPy/zeroshot_dms_subs_v1_1.pkl"
     )
 
 
@@ -129,10 +129,10 @@ def create_zeroshot_summary_v12_metadata() -> DatasetMetadata:
         taxonomy_id=None,
         coordinate_1_based=True,
         data_provider="Marks Lab at Harvard Medical School",
-        maintainer="pyProteinGym Package <noreply@example.com>",
-        rdata_class="Dict",
+        maintainer="ProteinGymPy Package <noreply@example.com>",
+        data_class="Dict",
         dispatch_class="Pickle",
-        rdata_path="pyProteinGym/zeroshot_summary_scores_v1_2.pkl"
+        data_path="ProteinGymPy/zeroshot_summary_scores_v1_2.pkl"
     )
 
 
@@ -150,10 +150,10 @@ def create_zeroshot_model_scores_metadata() -> DatasetMetadata:
         taxonomy_id=None,
         coordinate_1_based=True,
         data_provider="Marks Lab at Harvard Medical School",
-        maintainer="pyProteinGym Package <noreply@example.com>",
-        rdata_class="Dict",
+        maintainer="ProteinGymPy Package <noreply@example.com>",
+        data_class="Dict",
         dispatch_class="Pickle",
-        rdata_path="pyProteinGym/zeroshot_scores_v1_2.pkl"
+        data_path="ProteinGymPy/zeroshot_scores_v1_2.pkl"
     )
 
 
@@ -171,10 +171,10 @@ def create_supervised_metadata(fold_type: str) -> DatasetMetadata:
         taxonomy_id=None,
         coordinate_1_based=True,
         data_provider="Marks Lab at Harvard Medical School",
-        maintainer="pyProteinGym Package <noreply@example.com>",
-        rdata_class="Dict",
+        maintainer="ProteinGymPy Package <noreply@example.com>",
+        data_class="Dict",
         dispatch_class="Pickle",
-        rdata_path=f"pyProteinGym/supervised_{fold_type}5_scores_v1_2.pkl"
+        data_path=f"ProteinGymPy/supervised_{fold_type}5_scores_v1_2.pkl"
     )
 
 
@@ -192,10 +192,10 @@ def create_supervised_summary_metadata() -> DatasetMetadata:
         taxonomy_id=None,
         coordinate_1_based=True,
         data_provider="Marks Lab at Harvard Medical School",
-        maintainer="pyProteinGym Package <noreply@example.com>",
-        rdata_class="DataFrame",
+        maintainer="ProteinGymPy Package <noreply@example.com>",
+        data_class="DataFrame",
         dispatch_class="CSV",
-        rdata_path="pyProteinGym/supervised_summary_scores_v1_2.csv"
+        data_path="ProteinGymPy/supervised_summary_scores_v1_2.csv"
     )
 
 
@@ -230,10 +230,10 @@ def generate_pdb_metadata(pdb_directory: str) -> List[DatasetMetadata]:
                 taxonomy_id=None,
                 coordinate_1_based=True,
                 data_provider="Marks Lab at Harvard Medical School",
-                maintainer="pyProteinGym Package <noreply@example.com>",
-                rdata_class="str",
+                maintainer="ProteinGymPy Package <noreply@example.com>",
+                data_class="str",
                 dispatch_class="FilePath",
-                rdata_path=f"pyProteinGym/{filename}"
+                data_path=f"ProteinGymPy/{filename}"
             )
             
             metadata_list.append(metadata)
@@ -288,9 +288,9 @@ def create_complete_metadata_table(pdb_directory: Optional[str] = None) -> pd.Da
             'Coordinate_1_based': metadata.coordinate_1_based,
             'DataProvider': metadata.data_provider,
             'Maintainer': metadata.maintainer,
-            'RDataClass': metadata.rdata_class,
+            'DataClass': metadata.data_class,
             'DispatchClass': metadata.dispatch_class,
-            'RDataPath': metadata.rdata_path
+            'DataPath': metadata.data_path
         }
         rows.append(row)
     
