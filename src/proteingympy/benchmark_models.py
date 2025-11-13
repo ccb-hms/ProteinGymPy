@@ -1,5 +1,8 @@
 """
-Python port of R's benchmark_models() from the ProteinGymR package.
+benchmark_models.py - Python equivalent of benchmark_models.R
+
+Benchmark Variant Effect Prediction Models. `benchmark_models()` plots one of the five model performance metrics ("AUC", "MCC", "NDCG", "Spearman", "Top_recall") for up to 5 user-specified variant effect prediction tools listed in `available_models()` or `supervised_available_models()`. 
+
 
 This module provides:
 - available_models()
@@ -8,18 +11,6 @@ This module provides:
 - check_model_argument()
 - zeroshot_DMS_metrics() (helper that attempts to load metrics from disk)
 - benchmark_models(...)
-
-Notes:
-- The original R function loads benchmark scores via zeroshot_DMS_metrics().
-  This Python version will attempt to load a pickled dictionary
-  named "zeroshot_DMS_metrics.pkl" from the same directory as this file if
-  `metric_tables` is not provided to benchmark_models(). The pickled object
-  should be a dict mapping metric names ("AUC", "MCC", "NDCG", "Spearman",
-  "Top_recall") to pandas.DataFrame objects whose columns are model names
-  (as returned by available_models()) and rows are individual dataset scores.
-
-- If you can't / don't want to provide that file, pass metric_tables=<dict>
-  directly to benchmark_models().
 
 - The plot attempts to reproduce the R ggplot2 appearance using seaborn +
   matplotlib: a violin (to approximate the half-eye), a narrow boxplot, and
@@ -31,9 +22,6 @@ Dependencies:
 - seaborn
 - matplotlib
 
-Install with: pip install pandas numpy seaborn matplotlib
-
-Author: ported to Python to mimic behavior of the R function
 """
 
 from typing import List, Dict, Optional, Any
@@ -103,7 +91,6 @@ def available_models():
     return models
 
 
-
 def supervised_available_models():
     """
     Returns a list of available supervised model names for users to choose from.
@@ -125,53 +112,40 @@ def supervised_available_models():
     ]
     return smodels
 
+from typing import Iterable, List, Union
 
-def check_metric_argument(user_metric: List[str]) -> None:
+def check_metric_argument(user_metric: str) -> None:
+    """
+    Validate the metric argument.
+    """
     valid_metrics = ["AUC", "MCC", "NDCG", "Spearman", "Top_recall"]
-
-    if not all(m in valid_metrics for m in user_metric):
-        invalid_metric = [m for m in user_metric if m not in valid_metrics]
-        raise ValueError(f"Invalid metric(s) specified: {invalid_metric}")
-
-    if len(user_metric) > 1:
-        raise ValueError("Select only one metric for comparison")
+   # Check if metric is valid
+    if user_metric not in valid_metrics:
+        raise ValueError(f"Invalid metric specified: {user_metric}")
+    # No need to check length — the signature enforces single input
 
 
-def check_model_argument(models: List[str]) -> None:
-    valid_models = available_models()
+from typing import List, Union
 
-    if not all(m in valid_models for m in models):
-        invalid_models = [m for m in models if m not in valid_models]
+def check_model_argument(models: Union[str, List[str]]) -> None:
+    # Accept either a string or a list
+    if isinstance(models, str):
+        models = [models]
+
+    # Combine both sets of valid models
+    valid_models = available_models() + supervised_available_models()
+
+    # Check validity
+    invalid_models = [m for m in models if m not in valid_models]
+    if invalid_models:
         raise ValueError(f"Invalid model(s) specified: {invalid_models}")
 
+    # Check limit
     if len(models) > 5:
         raise ValueError("Select up to 5 models for comparison")
 
 
-def zeroshot_DMS_metrics() -> Dict[str, pd.DataFrame]:
-    """
-    Helper that attempts to load a pickled dict named 'zeroshot_DMS_metrics.pkl'
-    from the same directory. The expected object is a dict mapping metric name ->
-    pandas.DataFrame (columns = model names).
-
-    If not found, raises a FileNotFoundError and instructs the user to provide
-    metric_tables to benchmark_models().
-    """
-    this_dir = os.path.dirname(__file__)
-    candidate = os.path.join(this_dir, "zeroshot_DMS_metrics.pkl")
-    if os.path.exists(candidate):
-        with open(candidate, "rb") as fh:
-            obj = pickle.load(fh)
-        if not isinstance(obj, dict):
-            raise ValueError("zeroshot_DMS_metrics.pkl does not contain a dict.")
-        return obj
-    else:
-        raise FileNotFoundError(
-            "Could not find 'zeroshot_DMS_metrics.pkl' in the same directory. "
-            "Please provide metric_tables to benchmark_models(metric_tables=<dict>) "
-            "where the dict maps e.g. 'Spearman' -> pandas.DataFrame(columns=model_names)."
-        )
-
+from make_zeroshot_dms_benchmarks import get_zero_shot_benchmark_data
 
 def benchmark_models(
     metric: Optional[str] = None,
@@ -220,7 +194,7 @@ def benchmark_models(
 
     # Load metric tables if not provided
     if metric_tables is None:
-        metric_tables = zeroshot_DMS_metrics()
+        metric_tables = get_zero_shot_benchmark_data()
 
     if metric not in metric_tables:
         raise KeyError(
