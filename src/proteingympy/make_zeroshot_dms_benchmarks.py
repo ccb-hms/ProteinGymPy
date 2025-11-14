@@ -109,12 +109,14 @@ def _load_from_zenodo_v12(cache_dir: str) -> Dict[str, pd.DataFrame]:
     
     # Extract and load benchmark files
     score_list = {}
-    benchmark_dir = "DMS_zero_shot/substitutions"
+    benchmark_dir = "benchmarks/DMS_zero_shot/substitutions"
     
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         # Find DMS_level.csv files in each metric directory
         for metric in ["AUC", "MCC", "NDCG", "Spearman", "Top_recall"]:
             metric_file = f"{benchmark_dir}/{metric}/DMS_substitutions_{metric}_DMS_level.csv"
+            
+            #import pdb; pdb.set_trace()
             
             if metric_file in zip_ref.namelist():
                 print(f"Loading {metric} scores...")

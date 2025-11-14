@@ -1,27 +1,7 @@
 """
 benchmark_models.py - Python equivalent of benchmark_models.R
 
-Benchmark Variant Effect Prediction Models. `benchmark_models()` plots one of the five model performance metrics ("AUC", "MCC", "NDCG", "Spearman", "Top_recall") for up to 5 user-specified variant effect prediction tools listed in `available_models()` or `supervised_available_models()`. 
-
-
-This module provides:
-- available_models()
-- supervised_available_models()
-- check_metric_argument()
-- check_model_argument()
-- zeroshot_DMS_metrics() (helper that attempts to load metrics from disk)
-- benchmark_models(...)
-
-- The plot attempts to reproduce the R ggplot2 appearance using seaborn +
-  matplotlib: a violin (to approximate the half-eye), a narrow boxplot, and
-  jittered points.
-
-Dependencies:
-- pandas
-- numpy
-- seaborn
-- matplotlib
-
+Benchmark Variant Effect Prediction Models. `benchmark_models()` plots one of the five model performance metrics ("AUC", "MCC", "NDCG", "Spearman", "Top_recall") for up to 5 user-specified variant effect prediction tools listed in `available_models()`. 
 """
 
 from typing import List, Dict, Optional, Any
@@ -91,27 +71,6 @@ def available_models():
     return models
 
 
-def supervised_available_models():
-    """
-    Returns a list of available supervised model names for users to choose from.
-    Equivalent to the R function `supervised_available_models()`.
-    """
-    smodels = [
-        "OHE_Notaugmented",
-        "normalized_targets",
-        "OHE_Augmented_DeepSequence",
-        "OHE_Augmented_ESM1v",
-        "OHE_Augmented_MSATransformer",
-        "OHE_Augmented_Tranception",
-        "OHE_Augmented_TranceptEVE",
-        "Embeddings_Augmented_ESM1v",
-        "Embeddings_Augmented_MSATransformer",
-        "Embeddings_Augmented_Tranception",
-        "ProteinNPT",
-        "Kermut",
-    ]
-    return smodels
-
 from typing import Iterable, List, Union
 
 def check_metric_argument(user_metric: str) -> None:
@@ -119,10 +78,19 @@ def check_metric_argument(user_metric: str) -> None:
     Validate the metric argument.
     """
     valid_metrics = ["AUC", "MCC", "NDCG", "Spearman", "Top_recall"]
-   # Check if metric is valid
+
+    # Ensure scalar string
+    if not isinstance(user_metric, str):
+        raise TypeError(
+            f"Metric must be a single string, not {type(user_metric).__name__}: {user_metric}"
+        )
+
     if user_metric not in valid_metrics:
-        raise ValueError(f"Invalid metric specified: {user_metric}")
-    # No need to check length — the signature enforces single input
+        raise ValueError(
+            f"Invalid metric specified: {user_metric}. "
+            f"Valid metrics are: {', '.join(valid_metrics)}"
+        )
+
 
 
 from typing import List, Union
@@ -133,7 +101,7 @@ def check_model_argument(models: Union[str, List[str]]) -> None:
         models = [models]
 
     # Combine both sets of valid models
-    valid_models = available_models() + supervised_available_models()
+    valid_models = available_models()
 
     # Check validity
     invalid_models = [m for m in models if m not in valid_models]
@@ -184,13 +152,18 @@ def benchmark_models(
         print("No metric specified. Using default Spearman correlation")
         metric = "Spearman"
     else:
-        check_metric_argument([metric])
+        check_metric_argument(metric)
 
     # Handle models argument
     if models is None:
         raise ValueError("Select at least one model from available_models()")
-    else:
-        check_model_argument(models)
+
+    # Normalize here so downstream code always sees a list
+    if isinstance(models, str):
+        models = [models]
+
+    check_model_argument(models)
+
 
     # Load metric tables if not provided
     if metric_tables is None:
@@ -236,7 +209,11 @@ def benchmark_models(
     fig_width = max(8, n_models * 1.2)
     fig, ax = plt.subplots(figsize=(fig_width, 6))
 
-    palette = sns.color_palette("tab20", n_colors=n_models)
+    # ggplot2 default discrete palette (first 5 colors)
+    ggplot2_colors = ["#F8766D", "#E6D922", "#10C876", "#029FD3", "#C77CFF"]
+
+    # Use only as many as needed (n_models ≤ 5)
+    palette = ggplot2_colors[:n_models] 
 
     # Violin (approximate half-eye)
     sns.violinplot(
@@ -279,9 +256,9 @@ def benchmark_models(
     )
 
     ax.set_xlabel("")
-    ax.set_ylabel(f"{metric} score", fontsize=12)
-    ax.tick_params(axis="x", labelrotation=45, labelsize=10)
-    ax.tick_params(axis="y", labelsize=10)
+    ax.set_ylabel(f"{metric} score", fontsize=15)
+    ax.tick_params(axis="x", labelrotation=20, labelsize=12)
+    ax.tick_params(axis="y", labelsize=12)
 
     # Remove legend (in R plot legend shows models but it's redundant here)
     ax.get_legend() and ax.get_legend().remove()
