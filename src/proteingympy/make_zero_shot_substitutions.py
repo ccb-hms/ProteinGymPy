@@ -41,7 +41,7 @@ def get_zero_shot_scores_data(cache_dir: str = ".cache") -> Dict[str, pd.DataFra
     
     if not os.path.exists(zip_path):
         # URL from ProteinGym Zenodo v1.2
-        url = "https://zenodo.org/records/14997691/files/zero_shot_substitutions_scores.zip"
+        url = "https://zenodo.org/records/14997691/files/zero_shot_substitutions_scores.zip?download=1"
         print(f"Downloading zero-shot scores from {url}...")
         response = requests.get(url, stream=True)
         response.raise_for_status()

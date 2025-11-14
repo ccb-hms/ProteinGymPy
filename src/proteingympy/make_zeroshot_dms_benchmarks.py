@@ -97,7 +97,7 @@ def _load_from_zenodo_v12(cache_dir: str) -> Dict[str, pd.DataFrame]:
     
     if not os.path.exists(zip_path):
         # URL from ProteinGym Zenodo v1.2
-        url = "https://zenodo.org/records/14997691/files/DMS_benchmarks_performance.zip"
+        url = "https://zenodo.org/records/14997691/files/DMS_benchmark_performance.zip?download=1"
         print(f"Downloading benchmarks from {url}...")
         response = requests.get(url, stream=True)
         response.raise_for_status()
