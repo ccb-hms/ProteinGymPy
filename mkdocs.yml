@@ -1,0 +1,13 @@
+site_name: ProteinGymPy documentation
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - Vignettes:
+    - Data Import and Representation: data_import_and_representation.md
+    - Data Visualization and Exploration: visualization_exploration.md
+  - About:
+    - License: license.md
+    - Citation: Citation.md
+    - References: references.md

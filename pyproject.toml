@@ -26,6 +26,9 @@ visualization = [
     "nglview>=3.1.4",
     "scipy>=1.16.2",
 ]
+mkdocs = [
+    "mkdocs>=1.6.1",
+]
 
 [build-system]
 requires = ["hatchling"]
