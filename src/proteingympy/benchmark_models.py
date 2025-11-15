@@ -113,7 +113,7 @@ def check_model_argument(models: Union[str, List[str]]) -> None:
         raise ValueError("Select up to 5 models for comparison")
 
 
-from make_zeroshot_dms_benchmarks import get_zero_shot_benchmark_data
+from proteingympy.make_zeroshot_dms_benchmarks import get_zero_shot_benchmark_data
 
 def benchmark_models(
     metric: Optional[str] = None,
@@ -226,6 +226,8 @@ def benchmark_models(
         cut=0,
         palette=palette,
         linewidth=0.8,
+        hue="model",
+        legend=False 
     )
 
     # Narrow boxplot on top
@@ -235,10 +237,12 @@ def benchmark_models(
         data=res_long,
         order=ordered_models,
         ax=ax,
-        width=0.15,
+        width=0.2,
+        linewidth=0.8,
         showcaps=True,
         boxprops={"zorder": 2, "facecolor": "white"},
         showfliers=False,
+        orient="vertical"
     )
 
     # Jittered points
@@ -251,13 +255,13 @@ def benchmark_models(
         color="k",
         size=3,
         jitter=0.15,
-        alpha=0.4,
-        zorder=3,
+        alpha=0.5,
+        zorder=3
     )
 
     ax.set_xlabel("")
     ax.set_ylabel(f"{metric} score", fontsize=15)
-    ax.tick_params(axis="x", labelrotation=20, labelsize=12)
+    ax.tick_params(axis="x", labelrotation=15, labelsize=12)
     ax.tick_params(axis="y", labelsize=12)
 
     # Remove legend (in R plot legend shows models but it's redundant here)
