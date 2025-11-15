@@ -238,7 +238,7 @@ def benchmark_models(
         order=ordered_models,
         ax=ax,
         width=0.2,
-        linewidth=0.8,
+        linewidth=1,
         showcaps=True,
         boxprops={"zorder": 2, "facecolor": "white"},
         showfliers=False,
