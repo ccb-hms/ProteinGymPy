@@ -6,7 +6,7 @@ ProteinGymPy provides analysis-ready and reproducible access to these data resou
 
 Below we provide installation instructions, a quick start demo, and two vignettes detailing 1) data importation and representation, and 2) visualization and exploration.
 
-## Installation
+# Installation
 To install the software, we recommend using [uv](https://docs.astral.sh/uv/#installation) for python management:
 
 ```
@@ -21,7 +21,7 @@ Addtional packages are required for jupyter notebook visualization functions:
 uv pip install git+https://github.com/ccb-hms/ProteinGymPy.git#egg=ProteinGymPy[visualizations]
 ```
 
-## Usage
+# Usage
 
 ## Quick Start
 
@@ -117,7 +117,7 @@ The tests include:
 - Mock tests that don't require network access
 - Validation of data structure and consistency
 
-### References
+## References
 ```
 Notin, P., A. Kollasch, D. Ritter, L. van Niekerk, S. Paul, H. Spinner, N. Rollins, et al. 2023. “ProteinGym: Large-Scale Benchmarks for Protein Fitness Prediction and Design.” In Advances in Neural Information Processing Systems, edited by A. Oh, T. Neumann, A. Globerson, K. Saenko, M. Hardt, and S. Levine, 36:64331–79. Curran Associates, Inc.
 ```
