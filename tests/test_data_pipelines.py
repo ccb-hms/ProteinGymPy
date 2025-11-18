@@ -224,12 +224,38 @@ class TestDataPipelines(unittest.TestCase):
     
     @patch('proteingympy.make_alphamissense_supplementary.requests.get')
     def test_get_alphamissense_proteingym_data_download_error(self, mock_requests):
-        """Test AlphaMissense data download error handling."""
-        # Mock failed request
+        """If a local copy of the zip is available, function should not try downloading.
+        We mock requests.get to raise if called, but since repo zip exists, the function should
+        complete successfully and mock_requests should not be called.
+        """
+        # Mock failed request (if called)
         mock_requests.side_effect = Exception("Network error")
-        
-        with self.assertRaises(Exception):
-            get_alphamissense_proteingym_data(cache_dir=self.cache_dir)
+
+        # Should succeed using the bundled zip and not call requests.get
+        df = get_alphamissense_proteingym_data(cache_dir=self.cache_dir)
+        self.assertIsInstance(df, pd.DataFrame)
+        mock_requests.assert_not_called()
+
+    @patch('proteingympy.make_alphamissense_supplementary.requests.get')
+    def test_get_alphamissense_proteingym_data_missing_local_raises(self, mock_requests):
+        """If no local copy of the zip or csv exists, function should raise FileNotFoundError.
+        We patch os.path.exists in the module to fake absence of local files.
+        """
+        # Ensure requests.get would fail if called (but function should raise before attempting a download)
+        mock_requests.side_effect = Exception("Network error")
+
+        # Preserve the real os.path.exists for other calls
+        real_exists = os.path.exists
+        def side_effect(path):
+            # Fake that the local repo zip and cached csv/zip do not exist
+            if path.endswith('science.adg7492_data_s1_to_s9.zip') or path.endswith('Supplementary_Data_S8_proteingym.csv'):
+                return False
+            return real_exists(path)
+
+        with patch('proteingympy.make_alphamissense_supplementary.os.path.exists') as mock_exists:
+            mock_exists.side_effect = side_effect
+            with self.assertRaises(FileNotFoundError):
+                get_alphamissense_proteingym_data(cache_dir=self.cache_dir)
     
     def test_model_lists_consistency(self):
         """Test that model lists are consistent and reasonable."""

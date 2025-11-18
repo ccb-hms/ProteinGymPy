@@ -298,11 +298,6 @@ def model_corr_plot(
         - Use get_zero_shot_model_list() and get_supervised_model_list()
           to see available models
 
-    References:
-        - Cheng et al., Accurate proteome-wide missense variant effect prediction
-          with AlphaMissense. Science 381, eadg7492 (2023).
-        - Notin et al., ProteinGym: Large-Scale Benchmarks for Protein Fitness
-          Prediction and Design. NeurIPS 36:64331-64379 (2023).
     """
     # Check dependencies
     if stats is None:
