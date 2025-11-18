@@ -382,7 +382,6 @@ def plot_structure(
     dms_data: Optional[Dict[str, pd.DataFrame]] = None,
     start_pos: Optional[int] = None,
     end_pos: Optional[int] = None,
-    full_structure: bool = False,
     aggregate_fun: Callable = np.mean,
     color_scheme: Optional[str] = None
 ) -> Any:
@@ -410,9 +409,6 @@ def plot_structure(
         First amino acid position to plot. If None, uses minimum position.
     end_pos : int, optional
         Last amino acid position to plot. If None, uses maximum position.
-    full_structure : bool, default=False
-        If True, displays complete protein structure and greys out regions
-        without DMS data. If False, only shows regions with data.
     aggregate_fun : callable, default=np.mean
         Function to aggregate scores per position (e.g., np.mean, np.max, np.min)
     color_scheme : str, optional
@@ -422,8 +418,9 @@ def plot_structure(
         
     Returns
     -------
-    nglview.NGLWidget
-        Interactive 3D protein structure viewer with colored residues
+    tuple
+        (nglview.NGLWidget, matplotlib.figure.Figure)
+        Interactive 3D protein structure viewer with colored residues and colorbar figure
         
     Raises
     ------
@@ -447,7 +444,7 @@ def plot_structure(
     >>> from proteingympy.plot_structure import plot_structure
     >>> 
     >>> # Plot DMS scores for a specific region
-    >>> view = plot_structure(
+    >>> view, fig = plot_structure(
     ...     assay_name="C6KNH7_9INFA_Lee_2018",
     ...     start_pos=20,
     ...     end_pos=50,
@@ -455,7 +452,7 @@ def plot_structure(
     ... )
     >>> 
     >>> # Plot zero-shot model predictions
-    >>> view = plot_structure(
+    >>> view, fig = plot_structure(
     ...     assay_name="C6KNH7_9INFA_Lee_2018",
     ...     data_scores="GEMME",
     ...     start_pos=20,
@@ -463,9 +460,9 @@ def plot_structure(
     ... )
     >>> 
     >>> # Plot with EVE color scheme
-    >>> view = plot_structure(
+    >>> view, fig = plot_structure(
     ...     assay_name="ACE2_HUMAN_Chan_2020",
-    ...     data_scores="Kermut",
+    ...     data_scores="DMS",
     ...     color_scheme="EVE"
     ... )
     """
@@ -626,36 +623,88 @@ def plot_structure(
     if nv is None:
         raise ImportError("nglview is required for 3D visualization")
     
-    view = nv.show_structure_file(str(pdb_path))
-    view.clear_representations()
+    from nglview.color import ColormakerRegistry
     
-    if full_structure:
-        # Show entire structure in grey first
-        view.add_representation('cartoon', selection='all', color='grey')
-        
-        # Color residues with data
-        for _, row in filtered_df.iterrows():
-            pos = int(row['pos'])
-            color = row['color']
-            view.add_representation(
-                'cartoon',
-                selection=f'{pos}',
-                color=color
-            )
-    else:
-        # Only show residues with data
-        view.add_representation('cartoon', selection='none')
-        
-        for _, row in filtered_df.iterrows():
-            pos = int(row['pos'])
-            color = row['color']
-            view.add_representation(
-                'cartoon',
-                selection=f'{pos}',
-                color=color
-            )
+    view = nv.show_file(str(pdb_path), default=False)
+    view.stage.set_parameters(**{
+        "clipNear": 0, 
+        "clipFar": 100, 
+        "clipDist": 10,
+        "fogNear": 0, 
+        "fogFar": 1000,
+        "backgroundColor": "white",
+    })
+    
+    # Build color scheme as list of [color, selection] pairs
+    color_scheme_list = []
+    for _, row in filtered_df.iterrows():
+        pos = int(row['pos'])
+        color = row['color']
+        color_scheme_list.append([color, str(pos)])
+    
+    # Register the custom color scheme
+    scheme_id = ColormakerRegistry.add_selection_scheme(
+        "custom_colors", 
+        color_scheme_list
+    )
+    
+    # Add cartoon with the custom color scheme
+    view.add_cartoon(selection="protein", color="custom_colors")
     
     # Center view on selected region
-    view.center(selection=f'{start_pos}-{end_pos}')
+    view.center()
     
-    return view
+    # Create colorbar
+    try:
+        import matplotlib.pyplot as plt
+        from matplotlib.colors import LinearSegmentedColormap, Normalize
+        
+        fig, ax = plt.subplots(figsize=(6, 0.6))
+        fig.subplots_adjust(bottom=0.5)
+        
+        if data_scores == "DMS":
+            # Use the actual color scheme
+            if color_scheme == "EVE":
+                # EVE colors: black -> purple -> cyan -> yellow
+                colors_list = ['#000000', '#9440e8', '#00CED1', '#fde662']
+                n_bins = 100
+                cmap = LinearSegmentedColormap.from_list('eve', colors_list, N=n_bins)
+                vmin = filtered_df['aggregate_score'].min()
+                vmax = filtered_df['aggregate_score'].max()
+                label = 'DMS Score'
+            else:
+                # Default: red -> white -> blue
+                colors_list = ['#ff0000', '#ffffff', '#0000ff']
+                n_bins = 100
+                cmap = LinearSegmentedColormap.from_list('default', colors_list, N=n_bins)
+                vmin = filtered_df['aggregate_score'].min()
+                vmax = filtered_df['aggregate_score'].max()
+                label = 'DMS Score'
+        else:
+            # Model scores use quantile normalization
+            if color_scheme == "EVE":
+                colors_list = ['#000000', '#9440e8', '#00CED1', '#fde662']
+                n_bins = 100
+                cmap = LinearSegmentedColormap.from_list('eve', colors_list, N=n_bins)
+                vmin = filtered_df['quant_clamped'].min()
+                vmax = filtered_df['quant_clamped'].max()
+                label = f'{data_scores} Score (Quantile Normalized)'
+            else:
+                cmap = plt.get_cmap('viridis')
+                vmin = filtered_df['quant_clamped'].min()
+                vmax = filtered_df['quant_clamped'].max()
+                label = f'{data_scores} Score (Quantile Normalized)'
+        
+        norm = Normalize(vmin=vmin, vmax=vmax)
+        fig.colorbar(
+            plt.cm.ScalarMappable(norm=norm, cmap=cmap),
+            cax=ax, 
+            orientation='horizontal', 
+            label=label
+        )
+        
+    except ImportError:
+        warnings.warn("matplotlib not available, skipping colorbar generation")
+        fig = None
+    
+    return view, fig
