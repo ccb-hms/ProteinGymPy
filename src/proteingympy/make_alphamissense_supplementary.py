@@ -208,6 +208,20 @@ def get_alphamissense_proteingym_data(cache_dir: str = ".cache") -> pd.DataFrame
 
     # Extract CSV if not present
     if not os.path.exists(csv_path):
+        if not os.path.exists(zip_path):
+            print(f"Zip file not found locally. Downloading from GitHub...")
+            url = "https://github.com/ccb-hms/ProteinGymPy/blob/main/src/science.adg7492_data_s1_to_s9.zip?raw=true"
+            try:
+                response = requests.get(url, stream=True)
+                response.raise_for_status()
+                with open(cache_zip_path, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                zip_path = cache_zip_path
+                print(f"Downloaded {zip_path}")
+            except Exception as e:
+                print(f"Warning: Failed to download AlphaMissense data: {e}")
+
         if os.path.exists(zip_path):
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 extracted_name = _extract_proteingym_csv(zip_ref, csv_path)
