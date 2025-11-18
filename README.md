@@ -17,7 +17,7 @@ uv pip install git+https://github.com/ccb-hms/ProteinGymPy.git#egg=ProteinGymPy
 Addtional packages are required for jupyter notebook visualization functions:
 
 ```
-uv pip install git+https://github.com/ccb-hms/ProteinGymPy.git#egg=ProteinGymPy[visualizations]
+uv pip install 'ProteinGymPy[visualization] @ git+https://github.com/ccb-hms/ProteinGymPy.git'
 ```
 
 # Usage
