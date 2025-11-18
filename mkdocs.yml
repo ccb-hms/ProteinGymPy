@@ -2,11 +2,15 @@ site_name: ProteinGymPy documentation
 theme:
   name: readthedocs
 
+plugins:
+  - search
+  - mkdocs-jupyter
+
 nav:
   - Home: index.md
   - Vignettes:
-    - Data Import and Representation: data_import_and_representation.md
-    - Data Visualization and Exploration: visualization_exploration.md
+    - Data Import and Representation: data_importation_and_representation.ipynb
+    - Data Visualization and Exploration: visualization_exploration.ipynb
   - About:
     - License: LICENSE
     - Citation: CITATION.md

@@ -383,7 +383,8 @@ def plot_structure(
     start_pos: Optional[int] = None,
     end_pos: Optional[int] = None,
     aggregate_fun: Callable = np.mean,
-    color_scheme: Optional[str] = None
+    color_scheme: Optional[str] = None,
+    export_html: Optional[Union[str, Path]] = None
 ) -> Any:
     """
     Visualize DMS and model scores on 3D protein structures.
@@ -415,7 +416,10 @@ def plot_structure(
         Color scheme for visualization. Options:
         - None: blue-white-red gradient
         - "EVE": EVE-style black-purple-cyan-yellow gradient
-        
+    export_html : str or Path, optional
+        If provided, exports the 3D visualization to a standalone HTML file at this path.
+        The HTML file can be embedded in Jupyter notebooks or viewed in a web browser.
+
     Returns
     -------
     tuple
@@ -698,13 +702,24 @@ def plot_structure(
         norm = Normalize(vmin=vmin, vmax=vmax)
         fig.colorbar(
             plt.cm.ScalarMappable(norm=norm, cmap=cmap),
-            cax=ax, 
-            orientation='horizontal', 
+            cax=ax,
+            orientation='horizontal',
             label=label
         )
-        
+
+        # Close the figure to prevent automatic display in Jupyter
+        plt.close(fig)
+
     except ImportError:
         warnings.warn("matplotlib not available, skipping colorbar generation")
         fig = None
-    
+
+    # Export to HTML if requested
+    if export_html is not None:
+        try:
+            nv.write_html(str(export_html), [view])
+            print(f"3D structure exported to: {export_html}")
+        except Exception as e:
+            warnings.warn(f"Failed to export HTML: {e}")
+
     return view, fig
