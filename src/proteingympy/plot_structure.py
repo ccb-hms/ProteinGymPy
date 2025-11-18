@@ -6,13 +6,18 @@ or model scores for amino acid substitutions on 3D protein structures using nglv
 """
 
 import warnings
-from typing import Optional, Callable, List, Dict, Any, Union, Tuple
+import zipfile
+from typing import Optional, Callable, List, Dict, Any, Union, Tuple, cast
 import numpy as np
 import pandas as pd
 from pathlib import Path
 from scipy import stats
 import nglview as nv
 from Bio.PDB.PDBParser import PDBParser
+
+from .data_import_funcs import get_af2_structures_zip
+
+DEFAULT_CACHE_DIR = Path('.cache')
 
 
 def filter_by_pos(
@@ -304,6 +309,72 @@ def _rgb_to_hex(rgb: Tuple[int, int, int]) -> str:
     return f'#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}'
 
 
+def _ensure_af2_structures(cache_dir: Union[str, Path] = DEFAULT_CACHE_DIR) -> Path:
+    """Ensure AF2 structure archive is downloaded and extracted.
+
+    Parameters
+    ----------
+    cache_dir : str or Path, optional
+        Directory where the archive and extracted files should live.
+
+    Returns
+    -------
+    Path
+        Path to the directory containing extracted PDB files.
+    """
+    cache_dir = Path(cache_dir)
+    structures_root = cache_dir / 'ProteinGym_AF2_structures'
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    zip_path = Path(
+        get_af2_structures_zip(cache_dir=str(cache_dir), use_cache=True)
+    )
+
+    needs_extract = True
+    if structures_root.exists():
+        # Check if there are any PDB files already extracted
+        needs_extract = not any(structures_root.rglob('*.pdb'))
+
+    if needs_extract:
+        structures_root.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(structures_root)
+
+    return structures_root
+
+
+def _find_pdb_for_prot_id(prot_id: str, structures_root: Path) -> Path:
+    """Locate the PDB file corresponding to a ProteinGym protein ID."""
+    if not prot_id:
+        raise ValueError("Protein ID is empty; cannot locate PDB file.")
+
+    pdb_paths = list(structures_root.rglob('*.pdb'))
+    if not pdb_paths:
+        raise FileNotFoundError(
+            f"No PDB files found in extracted directory: {structures_root}"
+        )
+
+    exact_matches = [p for p in pdb_paths if p.stem == prot_id]
+    if len(exact_matches) == 1:
+        return exact_matches[0]
+    if len(exact_matches) > 1:
+        raise ValueError(
+            f"Multiple PDB files exactly matching '{prot_id}' found: {exact_matches}"
+        )
+
+    fuzzy_matches = [p for p in pdb_paths if prot_id in p.stem]
+    if not fuzzy_matches:
+        raise FileNotFoundError(
+            f"Could not find a PDB file for protein ID '{prot_id}' in {structures_root}"
+        )
+    if len(fuzzy_matches) > 1:
+        raise ValueError(
+            f"Multiple candidate PDB files found for protein ID '{prot_id}': {fuzzy_matches}"
+        )
+
+    return fuzzy_matches[0]
+
+
 def plot_structure(
     assay_name: str,
     pdb_file: Optional[Union[str, Path]] = None,
@@ -311,9 +382,9 @@ def plot_structure(
     dms_data: Optional[Dict[str, pd.DataFrame]] = None,
     start_pos: Optional[int] = None,
     end_pos: Optional[int] = None,
-    full_structure: bool = False,
     aggregate_fun: Callable = np.mean,
-    color_scheme: Optional[str] = None
+    color_scheme: Optional[str] = None,
+    export_html: Optional[Union[str, Path]] = None
 ) -> Any:
     """
     Visualize DMS and model scores on 3D protein structures.
@@ -339,20 +410,21 @@ def plot_structure(
         First amino acid position to plot. If None, uses minimum position.
     end_pos : int, optional
         Last amino acid position to plot. If None, uses maximum position.
-    full_structure : bool, default=False
-        If True, displays complete protein structure and greys out regions
-        without DMS data. If False, only shows regions with data.
     aggregate_fun : callable, default=np.mean
         Function to aggregate scores per position (e.g., np.mean, np.max, np.min)
     color_scheme : str, optional
         Color scheme for visualization. Options:
         - None: blue-white-red gradient
         - "EVE": EVE-style black-purple-cyan-yellow gradient
-        
+    export_html : str or Path, optional
+        If provided, exports the 3D visualization to a standalone HTML file at this path.
+        The HTML file can be embedded in Jupyter notebooks or viewed in a web browser.
+
     Returns
     -------
-    nglview.NGLWidget
-        Interactive 3D protein structure viewer with colored residues
+    tuple
+        (nglview.NGLWidget, matplotlib.figure.Figure)
+        Interactive 3D protein structure viewer with colored residues and colorbar figure
         
     Raises
     ------
@@ -376,7 +448,7 @@ def plot_structure(
     >>> from proteingympy.plot_structure import plot_structure
     >>> 
     >>> # Plot DMS scores for a specific region
-    >>> view = plot_structure(
+    >>> view, fig = plot_structure(
     ...     assay_name="C6KNH7_9INFA_Lee_2018",
     ...     start_pos=20,
     ...     end_pos=50,
@@ -384,7 +456,7 @@ def plot_structure(
     ... )
     >>> 
     >>> # Plot zero-shot model predictions
-    >>> view = plot_structure(
+    >>> view, fig = plot_structure(
     ...     assay_name="C6KNH7_9INFA_Lee_2018",
     ...     data_scores="GEMME",
     ...     start_pos=20,
@@ -392,34 +464,42 @@ def plot_structure(
     ... )
     >>> 
     >>> # Plot with EVE color scheme
-    >>> view = plot_structure(
+    >>> view, fig = plot_structure(
     ...     assay_name="ACE2_HUMAN_Chan_2020",
-    ...     data_scores="Kermut",
+    ...     data_scores="DMS",
     ...     color_scheme="EVE"
     ... )
     """
-    # Import data loading functions (assuming they exist in the package)
+    # Import data loading functions 
     try:
-        from .data_import_funcs import (  # type: ignore
-            dms_substitutions,
-            zeroshot_substitutions,
-            supervised_substitutions,
-            available_models,
-            supervised_available_models
+        from .make_dms_substitutions import get_dms_substitution_data
+        from .make_zero_shot_substitutions import (
+            get_zero_shot_scores_data,
+            get_zero_shot_model_list
         )
-    except ImportError:
+        from .make_supervised_scores import (
+            get_supervised_scores_data,
+            get_supervised_model_list
+        )
+    except ImportError as exc:
         raise ImportError(
-            "Required data import functions not found. "
-            "Please ensure data_import_funcs.py is available."
-        )
+            "Required ProteinGym data pipeline functions not found. "
+            "Please ensure the make_* modules are available."
+        ) from exc
     
     # Validate data_scores
-    valid_scores = ['DMS']
+    zero_shot_models: List[str] = []
+    supervised_models: List[str] = []
     try:
-        valid_scores.extend(available_models())
-        valid_scores.extend(supervised_available_models())
+        zero_shot_models = get_zero_shot_model_list()
     except Exception:
-        warnings.warn("Could not load available models list")
+        warnings.warn("Could not load zero-shot model list")
+    try:
+        supervised_models = get_supervised_model_list()
+    except Exception:
+        warnings.warn("Could not load supervised model list")
+
+    valid_scores = ['DMS'] + zero_shot_models + supervised_models
     
     if data_scores not in valid_scores:
         raise ValueError(
@@ -430,8 +510,8 @@ def plot_structure(
     # Load appropriate data based on data_scores
     if data_scores == "DMS":
         if dms_data is None:
-            print("'dms_data' not provided, loading with dms_substitutions()")
-            dms_data = dms_substitutions()
+            print("'dms_data' not provided, loading with get_dms_substitution_data()")
+            dms_data = get_dms_substitution_data()
         
         if dms_data is not None and assay_name not in dms_data:
             raise ValueError(f"Assay '{assay_name}' not found in dms_data")
@@ -442,27 +522,40 @@ def plot_structure(
         df = dms_data[assay_name].copy()
         df = df.rename(columns={'DMS_score': 'pg_scores'})
         
-    elif data_scores in available_models():
+    elif data_scores in zero_shot_models:
         print(f"Using zero-shot model scores: {data_scores}")
-        data = zeroshot_substitutions()
+        data = get_zero_shot_scores_data()
+        if assay_name not in data:
+            raise ValueError(f"Assay '{assay_name}' not found in zero-shot data")
+        if data_scores not in data[assay_name].columns:
+            raise ValueError(
+                f"Model '{data_scores}' not available for assay '{assay_name}'"
+            )
         df = data[assay_name][['mutant', data_scores]].copy()
         df = df.rename(columns={data_scores: 'pg_scores'})
         
     else:  # Supervised model
         print(f"Using semi-supervised model scores: {data_scores}")
-        data = supervised_substitutions()
-        df = data[assay_name][['mutant', data_scores]].copy()
+        supervised_data, _ = get_supervised_scores_data()
+        if not supervised_data:
+            raise ValueError("Could not load supervised model data")
+        if assay_name not in supervised_data:
+            raise ValueError(
+                f"Assay '{assay_name}' not found in supervised model data"
+            )
+        df = supervised_data[assay_name]
+        if data_scores not in df.columns:
+            raise ValueError(
+                f"Model '{data_scores}' not available for assay '{assay_name}'"
+            )
+        df = df[['mutant', data_scores]].copy()
         df = df.rename(columns={data_scores: 'pg_scores'})
     
     # Load PDB file
     if pdb_file is None:
-        # Try to find PDB file automatically
-        prot_id = get_prot_ids(assay_name)
-        # This would need to be implemented based on your data structure
-        raise NotImplementedError(
-            "Automatic PDB file loading not yet implemented. "
-            "Please provide pdb_file parameter."
-        )
+        prot_id = cast(str, get_prot_ids(assay_name))
+        structures_root = _ensure_af2_structures(DEFAULT_CACHE_DIR)
+        pdb_file = _find_pdb_for_prot_id(prot_id, structures_root)
     
     pdb_path = Path(pdb_file)
     if not pdb_path.exists():
@@ -534,36 +627,99 @@ def plot_structure(
     if nv is None:
         raise ImportError("nglview is required for 3D visualization")
     
-    view = nv.show_structure_file(str(pdb_path))
-    view.clear_representations()
+    from nglview.color import ColormakerRegistry
     
-    if full_structure:
-        # Show entire structure in grey first
-        view.add_representation('cartoon', selection='all', color='grey')
-        
-        # Color residues with data
-        for _, row in filtered_df.iterrows():
-            pos = int(row['pos'])
-            color = row['color']
-            view.add_representation(
-                'cartoon',
-                selection=f'{pos}',
-                color=color
-            )
-    else:
-        # Only show residues with data
-        view.add_representation('cartoon', selection='none')
-        
-        for _, row in filtered_df.iterrows():
-            pos = int(row['pos'])
-            color = row['color']
-            view.add_representation(
-                'cartoon',
-                selection=f'{pos}',
-                color=color
-            )
+    view = nv.show_file(str(pdb_path), default=False)
+    view.stage.set_parameters(**{
+        "clipNear": 0, 
+        "clipFar": 100, 
+        "clipDist": 10,
+        "fogNear": 0, 
+        "fogFar": 1000,
+        "backgroundColor": "white",
+    })
+    
+    # Build color scheme as list of [color, selection] pairs
+    color_scheme_list = []
+    for _, row in filtered_df.iterrows():
+        pos = int(row['pos'])
+        color = row['color']
+        color_scheme_list.append([color, str(pos)])
+    
+    # Register the custom color scheme
+    scheme_id = ColormakerRegistry.add_selection_scheme(
+        "custom_colors", 
+        color_scheme_list
+    )
+    
+    # Add cartoon with the custom color scheme
+    view.add_cartoon(selection="protein", color="custom_colors")
     
     # Center view on selected region
-    view.center(selection=f'{start_pos}-{end_pos}')
+    view.center()
     
-    return view
+    # Create colorbar
+    try:
+        import matplotlib.pyplot as plt
+        from matplotlib.colors import LinearSegmentedColormap, Normalize
+        
+        fig, ax = plt.subplots(figsize=(6, 0.6))
+        fig.subplots_adjust(bottom=0.5)
+        
+        if data_scores == "DMS":
+            # Use the actual color scheme
+            if color_scheme == "EVE":
+                # EVE colors: black -> purple -> cyan -> yellow
+                colors_list = ['#000000', '#9440e8', '#00CED1', '#fde662']
+                n_bins = 100
+                cmap = LinearSegmentedColormap.from_list('eve', colors_list, N=n_bins)
+                vmin = filtered_df['aggregate_score'].min()
+                vmax = filtered_df['aggregate_score'].max()
+                label = 'DMS Score'
+            else:
+                # Default: red -> white -> blue
+                colors_list = ['#ff0000', '#ffffff', '#0000ff']
+                n_bins = 100
+                cmap = LinearSegmentedColormap.from_list('default', colors_list, N=n_bins)
+                vmin = filtered_df['aggregate_score'].min()
+                vmax = filtered_df['aggregate_score'].max()
+                label = 'DMS Score'
+        else:
+            # Model scores use quantile normalization
+            if color_scheme == "EVE":
+                colors_list = ['#000000', '#9440e8', '#00CED1', '#fde662']
+                n_bins = 100
+                cmap = LinearSegmentedColormap.from_list('eve', colors_list, N=n_bins)
+                vmin = filtered_df['quant_clamped'].min()
+                vmax = filtered_df['quant_clamped'].max()
+                label = f'{data_scores} Score (Quantile Normalized)'
+            else:
+                cmap = plt.get_cmap('viridis')
+                vmin = filtered_df['quant_clamped'].min()
+                vmax = filtered_df['quant_clamped'].max()
+                label = f'{data_scores} Score (Quantile Normalized)'
+        
+        norm = Normalize(vmin=vmin, vmax=vmax)
+        fig.colorbar(
+            plt.cm.ScalarMappable(norm=norm, cmap=cmap),
+            cax=ax,
+            orientation='horizontal',
+            label=label
+        )
+
+        # Close the figure to prevent automatic display in Jupyter
+        plt.close(fig)
+
+    except ImportError:
+        warnings.warn("matplotlib not available, skipping colorbar generation")
+        fig = None
+
+    # Export to HTML if requested
+    if export_html is not None:
+        try:
+            nv.write_html(str(export_html), [view])
+            print(f"3D structure exported to: {export_html}")
+        except Exception as e:
+            warnings.warn(f"Failed to export HTML: {e}")
+
+    return view, fig
