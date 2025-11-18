@@ -8,6 +8,8 @@ from .make_supervised_scores import get_supervised_scores_data, get_supervised_m
 from .make_zero_shot_substitutions import get_zero_shot_scores_data, get_zero_shot_model_list
 from .make_zeroshot_dms_benchmarks import get_zero_shot_benchmark_data, get_benchmark_summary_stats, get_top_models_by_metric
 from .model_corr_plot import model_corr_plot, get_available_models
+from .dms_corr_plot import dms_corr_plot
+
 
 # For convenience, expose the most commonly used functions
 __all__ = [
