@@ -8,6 +8,5 @@ nav:
     - Data Import and Representation: data_import_and_representation.md
     - Data Visualization and Exploration: visualization_exploration.md
   - About:
-    - License: license.md
-    - Citation: citation.md
-    - References: references.md
+    - License: LICENSE
+    - Citation: CITATION.md
