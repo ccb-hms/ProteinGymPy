@@ -10,8 +10,8 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 from proteingympy import (
-    get_supervised_model_list,
-    get_zero_shot_model_list,
+    available_supervised_models,
+    available_zero_shot_models,
     create_complete_metadata_table
 )
 
@@ -22,14 +22,14 @@ def main():
     # Show available models
     print("\n📋 Available Models:")
     
-    supervised = get_supervised_model_list()
+    supervised = available_supervised_models()
     print(f"\nSupervised models ({len(supervised)}):")
     for i, model in enumerate(supervised[:5], 1):
         print(f"  {i}. {model}")
     if len(supervised) > 5:
         print(f"  ... and {len(supervised)-5} more")
     
-    zeroshot = get_zero_shot_model_list()  
+    zeroshot = available_zero_shot_models()  
     print(f"\nZero-shot models ({len(zeroshot)}):")
     for i, model in enumerate(zeroshot[:5], 1):
         print(f"  {i}. {model}")

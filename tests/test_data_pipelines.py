@@ -21,10 +21,10 @@ from proteingympy import (
     get_dms_metadata,
     get_alphamissense_proteingym_data,
     get_alphamissense_summary_stats,
-    get_supervised_scores_data,
-    get_supervised_model_list,
-    get_zero_shot_scores_data,
-    get_zero_shot_model_list,
+    get_supervised_substitution_data,
+    available_supervised_models,
+    get_zero_shot_substitution_data,
+    available_zero_shot_models,
     get_zero_shot_benchmark_data,
     get_benchmark_summary_stats,
     get_top_models_by_metric,
@@ -46,9 +46,9 @@ class TestDataPipelines(unittest.TestCase):
         """Clean up test fixtures."""
         shutil.rmtree(self.temp_dir)
     
-    def test_get_supervised_model_list(self):
+    def test_available_supervised_models(self):
         """Test that supervised model list is returned correctly."""
-        models = get_supervised_model_list()
+        models = available_supervised_models()
         
         self.assertIsInstance(models, list)
         self.assertGreater(len(models), 0)
@@ -58,9 +58,9 @@ class TestDataPipelines(unittest.TestCase):
         # Check no duplicates
         self.assertEqual(len(models), len(set(models)))
     
-    def test_get_zero_shot_model_list(self):
+    def test_available_zero_shot_models(self):
         """Test that zero-shot model list is returned correctly."""
-        models = get_zero_shot_model_list()
+        models = available_zero_shot_models()
         
         self.assertIsInstance(models, list)
         self.assertGreater(len(models), 0)
@@ -205,14 +205,14 @@ class TestDataPipelines(unittest.TestCase):
         self.assertEqual(len(top_models), 0)
     
     @patch('proteingympy.make_supervised_scores.zipfile.ZipFile')
-    def test_get_supervised_scores_data_structure(self, mock_zipfile):
+    def test_get_supervised_substitution_data_structure(self, mock_zipfile):
         """Test supervised scores data structure without actual download."""
         # Mock zipfile to return empty results for now
         mock_zip_instance = MagicMock()
         mock_zipfile.return_value.__enter__.return_value = mock_zip_instance
         mock_zip_instance.namelist.return_value = []
         
-        supervised_data, summary_df = get_supervised_scores_data("random_5", cache_dir=self.cache_dir)
+        supervised_data, summary_df = get_supervised_substitution_data("random_5", cache_dir=self.cache_dir)
         
         self.assertIsInstance(supervised_data, dict)
         self.assertIsInstance(summary_df, pd.DataFrame)
@@ -220,7 +220,7 @@ class TestDataPipelines(unittest.TestCase):
     def test_invalid_fold_type(self):
         """Test invalid fold type raises error."""
         with self.assertRaises(ValueError):
-            get_supervised_scores_data("invalid_fold", cache_dir=self.cache_dir)
+            get_supervised_substitution_data("invalid_fold", cache_dir=self.cache_dir)
     
     @patch('proteingympy.make_alphamissense_supplementary.requests.get')
     def test_get_alphamissense_proteingym_data_download_error(self, mock_requests):
@@ -259,8 +259,8 @@ class TestDataPipelines(unittest.TestCase):
     
     def test_model_lists_consistency(self):
         """Test that model lists are consistent and reasonable."""
-        supervised_models = get_supervised_model_list()
-        zeroshot_models = get_zero_shot_model_list()
+        supervised_models = available_supervised_models()
+        zeroshot_models = available_zero_shot_models()
         
         # Should be different sets (supervised vs zero-shot)
         self.assertNotEqual(set(supervised_models), set(zeroshot_models))
@@ -304,8 +304,8 @@ class TestDataPipelineIntegration(unittest.TestCase):
     
     def test_model_list_functions(self):
         """Test all model list functions work together."""
-        supervised = get_supervised_model_list()
-        zeroshot = get_zero_shot_model_list()
+        supervised = available_supervised_models()
+        zeroshot = available_zero_shot_models()
         
         # Should have different models
         overlap = set(supervised) & set(zeroshot)

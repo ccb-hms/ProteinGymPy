@@ -23,10 +23,10 @@ from proteingympy import (
     get_dms_metadata, 
     get_alphamissense_proteingym_data,
     get_alphamissense_summary_stats,
-    get_supervised_scores_data,
-    get_supervised_model_list,
-    get_zero_shot_scores_data,
-    get_zero_shot_model_list,
+    get_supervised_substitution_data,
+    available_supervised_models,
+    get_zero_shot_substitution_data,
+    available_zero_shot_models,
     get_zero_shot_benchmark_data,
     get_benchmark_summary_stats,
     get_top_models_by_metric,
@@ -102,7 +102,7 @@ def example_supervised_scores():
     # Load supervised scores for random_5 fold
     print("Loading supervised model scores (random_5 fold)...")
     try:
-        supervised_data, summary_metrics = get_supervised_scores_data("random_5", cache_dir=".cache")
+        supervised_data, summary_metrics = get_supervised_substitution_data("random_5", cache_dir=".cache")
         
         print(f"✓ Loaded supervised data for {len(supervised_data)} DMS assays")
         
@@ -117,7 +117,7 @@ def example_supervised_scores():
             print(f"  Summary metrics shape: {summary_metrics.shape}")
         
         # Show available models
-        models = get_supervised_model_list()
+        models = available_supervised_models()
         print(f"  Available models ({len(models)}): {', '.join(models[:5])}...")
         
     except Exception as e:
@@ -134,7 +134,7 @@ def example_zero_shot_scores():
     
     print("Loading zero-shot model scores...")
     try:
-        zeroshot_data = get_zero_shot_scores_data(cache_dir=".cache")
+        zeroshot_data = get_zero_shot_substitution_data(cache_dir=".cache")
         
         print(f"✓ Loaded zero-shot data for {len(zeroshot_data)} DMS assays")
         
@@ -146,7 +146,7 @@ def example_zero_shot_scores():
             print(f"  Model columns: {len(sample_df.columns) - 6}")  # Subtract core columns
         
         # Show available models
-        models = get_zero_shot_model_list()
+        models = available_zero_shot_models()
         print(f"  Available models ({len(models)}): {', '.join(models[:5])}...")
         
     except Exception as e:

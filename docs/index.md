@@ -44,7 +44,7 @@ Load other datasets:
 from proteingympy import (
     get_alphamissense_proteingym_data,
     get_zero_shot_benchmark_data,
-    get_supervised_scores_data
+    get_supervised_substitution_data
 )
 
 # AlphaMissense pathogenicity scores
@@ -55,7 +55,7 @@ benchmarks = get_zero_shot_benchmark_data()
 print(f"Available metrics: {list(benchmarks.keys())}")
 
 # Supervised model predictions
-supervised_data, summary = get_supervised_scores_data("random_5")
+supervised_data, summary = get_supervised_substitution_data("random_5")
 ```
 
 ## Available Functions
@@ -65,11 +65,11 @@ supervised_data, summary = get_supervised_scores_data("random_5")
 | `get_dms_substitution_data()` | Load 217 DMS substitution assays |
 | `get_dms_metadata()` | Load DMS assay metadata/reference file |
 | `get_alphamissense_proteingym_data()` | Load AlphaMissense pathogenicity scores |
-| `get_supervised_scores_data()` | Load supervised model predictions |
-| `get_zero_shot_scores_data()` | Load zero-shot model predictions |
+| `get_supervised_substitution_data()` | Load supervised model predictions for DMS subsitutions |
+| `get_zero_shot_substitution_data()` | Load zero-shot model predictions for DMS subsitutions |
 | `get_zero_shot_benchmark_data()` | Load benchmarking metrics |
-| `get_supervised_model_list()` | Get list of available supervised models |
-| `get_zero_shot_model_list()` | Get list of available zero-shot models |
+| `Load supervised model predictions for substitutions ()` | Get list of available supervised models |
+| `available_zero_shot_models()` | Get list of available zero-shot models |
 | `create_complete_metadata_table()` | Generate comprehensive metadata |
 | `benchmark_models()` | Benchmark multiple variant effect prediction models |
 | `dms_corr_plot()` | Correlate model performance and DMS scores|

@@ -13,7 +13,7 @@ from typing import Dict, List, Optional, Any
 import re
 
 
-def get_zero_shot_scores_data(cache_dir: str = ".cache") -> Dict[str, pd.DataFrame]:
+def get_zero_shot_substitution_data(cache_dir: str = ".cache") -> Dict[str, pd.DataFrame]:
     """
     Download and process ProteinGym zero-shot model scores for DMS substitutions.
     
@@ -192,7 +192,7 @@ def _clean_zeroshot_column_names(zeroshot_tables: Dict[str, pd.DataFrame]) -> Di
     return cleaned_tables
 
 
-def get_zero_shot_model_list() -> List[str]:
+def available_zero_shot_models() -> List[str]:
     """
     Get list of zero-shot models available in ProteinGym v1.2.
     
@@ -200,16 +200,47 @@ def get_zero_shot_model_list() -> List[str]:
         List of model names (cleaned with underscores)
     """
     # Based on ProteinGym v1.2, there are 79 zero-shot models
-    # This is a representative subset - full list would come from actual data
     models = [
-        "ESM_2_t48_15B_UR50D", "ESM_2_t36_3B_UR50D", "ESM_2_t33_650M_UR50D",
-        "ESM_2_t30_150M_UR50D", "ESM_2_t12_35M_UR50D", "ESM_2_t6_8M_UR50D",
-        "ESM_1v_t34_670M_UR100", "ESM_1v_t33_650M_UR90S", "ESM_1b_t33_650M_UR50S",
-        "MSA_Transformer", "ProtTrans_t5_xl_u50", "ProtTrans_t5_xxl_u50",
-        "Ankh_large", "Ankh_base", "ProstT5", "SaProt_650M", "SaProt_35M",
-        "Tranception_L", "Tranception_M", "EVE", "GEMME", "DeepSequence",
-        "Vespa", "SIFT", "PROVEAN", "FoldX", "Rosetta", "CADD",
-        "AlphaMissense", "ESM1b_regression", "ESM_variants"
+        "Site_Independent", "EVmutation",
+        "DeepSequence_single", "DeepSequence_ensemble",
+        "EVE_single", "EVE_ensemble",
+        "Unirep", "Unirep_evotune",
+        "MSA_Transformer_single", "MSA_Transformer_ensemble",
+        "ESM1b", "ESM1v_single",
+        "ESM1v_ensemble", "ESM2_8M",
+        "ESM2_35M", "ESM2_150M",
+        "ESM2_650M", "ESM2_3B",
+        "ESM2_15B", "Wavenet",
+        "RITA_s", "RITA_m",
+        "RITA_l", "RITA_xl",
+        "Progen2_small", "Progen2_medium",
+        "Progen2_base", "Progen2_large",
+        "Progen2_xlarge", "GEMME",
+        "VESPA", "VESPAl",
+        "VespaG", "ProtGPT2",
+        "Tranception_S_no_retrieval", "Tranception_M_no_retrieval",
+        "Tranception_L_no_retrieval", "Tranception_S",
+        "Tranception_M", "Tranception_L",
+        "TranceptEVE_S", "TranceptEVE_M",
+        "TranceptEVE_L", "CARP_38M",
+        "CARP_600K", "CARP_640M",
+        "CARP_76M", "MIF",
+        "MIFST", "ESM_IF1",
+        "ProteinMPNN", "ProtSSN_k10_h512",
+        "ProtSSN_k10_h768", "ProtSSN_k10_h1280",
+        "ProtSSN_k20_h512", "ProtSSN_k20_h768",
+        "ProtSSN_k20_h1280", "ProtSSN_k30_h512",
+        "ProtSSN_k30_h768", "ProtSSN_k30_h1280",
+        "ProtSSN_ensemble", "SaProt_650M_AF2",
+        "SaProt_35M_AF2", "PoET",
+        "MULAN_small", "ProSST_20",
+        "ProSST_128", "ProSST_512",
+        "ProSST_1024", "ProSST_2048",
+        "ProSST_4096", "ESCOTT",
+        "VenusREM", "RSALOR",
+        "S2F", "S2F_MSA",
+        "S3F", "S3F_MSA",
+        "SiteRM"
     ]
     return models
 
@@ -243,7 +274,7 @@ def filter_zero_shot_by_models(
     return filtered_tables
 
 
-def get_zero_shot_summary_stats(zeroshot_tables: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
+def get_zero_shot_metrics(zeroshot_tables: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
     """
     Generate summary statistics for zero-shot data.
     
@@ -298,14 +329,14 @@ if __name__ == "__main__":
         print(f"Columns: {list(sample_df.columns)}")
         
         # Show summary stats
-        stats = get_zero_shot_summary_stats(zeroshot_data)
+        stats = get_zero_shot_metrics(zeroshot_data)
         print(f"\nSummary Statistics:")
         for key, value in stats.items():
             if key not in ['assay_sizes', 'model_names']:
                 print(f"{key}: {value}")
     
     # Show available models
-    models = get_zero_shot_model_list()
+    models = available_zero_shot_models()
     print(f"\nAvailable zero-shot models (sample of {len(models)}):")
     for i, model in enumerate(models[:10]):  # Show first 10
         print(f"  {i+1}. {model}")

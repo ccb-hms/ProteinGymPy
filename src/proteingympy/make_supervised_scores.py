@@ -14,12 +14,12 @@ from typing import Dict, List, Optional, Tuple
 import re
 
 
-def get_supervised_scores_data(
+def get_supervised_substitution_data(
     fold_type: str = "random_5", 
     cache_dir: str = ".cache"
 ) -> Tuple[Dict[str, pd.DataFrame], pd.DataFrame]:
     """
-    Download and process ProteinGym supervised model scores.
+    Download and process raw ProteinGym supervised model substitution scores.
     
     Args:
         fold_type: Type of cross-validation fold ("contiguous_5", "modulo_5", or "random_5")
@@ -56,7 +56,7 @@ def get_supervised_scores_data(
     supervised_tables = _clean_supervised_column_names(supervised_tables)
     
     # Load summary metrics
-    summary_df = _load_supervised_summary_metrics(cache_dir)
+    summary_df = get_supervised_metrics(cache_dir)
     
     return supervised_tables, summary_df
 
@@ -197,7 +197,7 @@ def _clean_supervised_column_names(supervised_tables: Dict[str, pd.DataFrame]) -
     return cleaned_tables
 
 
-def _load_supervised_summary_metrics(cache_dir: str) -> pd.DataFrame:
+def get_supervised_metrics(cache_dir: str) -> pd.DataFrame:
     """
     Load supervised model summary metrics.
     
@@ -243,19 +243,21 @@ def _load_supervised_summary_metrics(cache_dir: str) -> pd.DataFrame:
     return summary_df
 
 
-def get_supervised_model_list() -> List[str]:
+def available_supervised_models() -> List[str]:
     """
     Get list of supervised models available in ProteinGym.
     
     Returns:
         List of model names
     """
-    # Based on the R script, there are 12 supervised models
-    # This would be populated from the actual data files
+    # 12 semi-supervised models available in ProteinGym v1.2
     models = [
-        "ProteinNPT", "MSA_Transformer", "Tranception", "EVE", 
-        "DeepSequence", "GEMME", "ESM_1v", "ESM_1b", "ESM_2",
-        "Vespa", "SaProt", "ProstT5"
+        "OHE_Notaugmented", "normalized_targets", 
+             "OHE_Augmented_DeepSequence", "OHE_Augmented_ESM1v", 
+             "OHE_Augmented_MSATransformer", "OHE_Augmented_Tranception", 
+             "OHE_Augmented_TranceptEVE", "Embeddings_Augmented_ESM1v", 
+             "Embeddings_Augmented_MSATransformer", 
+             "Embeddings_Augmented_Tranception", "ProteinNPT", "Kermut"
     ]
     return models
 
@@ -294,7 +296,7 @@ if __name__ == "__main__":
     print("Loading supervised scores data...")
     
     # Load random_5 fold data as example
-    supervised_data, summary_metrics = get_supervised_scores_data("random_5")
+    supervised_data, summary_metrics = get_supervised_substitution_data("random_5")
     
     print(f"Loaded supervised data for {len(supervised_data)} DMS assays")
     
@@ -313,7 +315,7 @@ if __name__ == "__main__":
         print(summary_metrics.head())
     
     # Show available models
-    models = get_supervised_model_list()
+    models = available_supervised_models()
     print(f"\nAvailable supervised models ({len(models)}):")
     for model in models:
         print(f"  - {model}")

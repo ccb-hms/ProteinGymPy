@@ -474,12 +474,12 @@ def plot_structure(
     try:
         from .make_dms_substitutions import get_dms_substitution_data
         from .make_zero_shot_substitutions import (
-            get_zero_shot_scores_data,
-            get_zero_shot_model_list
+            get_zero_shot_substitution_data,
+            available_zero_shot_models
         )
         from .make_supervised_scores import (
-            get_supervised_scores_data,
-            get_supervised_model_list
+            get_supervised_substitution_data,
+            available_supervised_models
         )
     except ImportError as exc:
         raise ImportError(
@@ -491,11 +491,11 @@ def plot_structure(
     zero_shot_models: List[str] = []
     supervised_models: List[str] = []
     try:
-        zero_shot_models = get_zero_shot_model_list()
+        zero_shot_models = available_zero_shot_models()
     except Exception:
         warnings.warn("Could not load zero-shot model list")
     try:
-        supervised_models = get_supervised_model_list()
+        supervised_models = available_supervised_models()
     except Exception:
         warnings.warn("Could not load supervised model list")
 
@@ -524,7 +524,7 @@ def plot_structure(
         
     elif data_scores in zero_shot_models:
         print(f"Using zero-shot model scores: {data_scores}")
-        data = get_zero_shot_scores_data()
+        data = get_zero_shot_substitution_data()
         if assay_name not in data:
             raise ValueError(f"Assay '{assay_name}' not found in zero-shot data")
         if data_scores not in data[assay_name].columns:
@@ -536,7 +536,7 @@ def plot_structure(
         
     else:  # Supervised model
         print(f"Using semi-supervised model scores: {data_scores}")
-        supervised_data, _ = get_supervised_scores_data()
+        supervised_data, _ = get_supervised_substitution_data()
         if not supervised_data:
             raise ValueError("Could not load supervised model data")
         if assay_name not in supervised_data:

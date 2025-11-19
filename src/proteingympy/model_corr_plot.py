@@ -24,12 +24,12 @@ except ImportError:
 
 from .make_alphamissense_supplementary import get_alphamissense_proteingym_data
 from .make_zero_shot_substitutions import (
-    get_zero_shot_scores_data,
-    get_zero_shot_model_list
+    get_zero_shot_substitution_data,
+    available_zero_shot_models
 )
 from .make_supervised_scores import (
-    get_supervised_scores_data,
-    get_supervised_model_list
+    get_supervised_substitution_data,
+    available_supervised_models
 )
 
 
@@ -122,8 +122,8 @@ def _get_model_dataframe(
     Returns:
         DataFrame with columns: DMS_id, UniProt_id, mutant, [model_name]
     """
-    zero_shot_models = get_zero_shot_model_list()
-    supervised_models = get_supervised_model_list()
+    zero_shot_models = available_zero_shot_models()
+    supervised_models = available_supervised_models()
 
     if model == "AlphaMissense":
         model_table = _filter_alphamissense_table(
@@ -138,7 +138,7 @@ def _get_model_dataframe(
 
     elif model in zero_shot_models:
         # Load zero-shot data
-        zeroshot_data = get_zero_shot_scores_data(cache_dir=cache_dir)
+        zeroshot_data = get_zero_shot_substitution_data(cache_dir=cache_dir)
         model_table = _filter_model_table(
             model_table=zeroshot_data,
             uniprot_id=uniprot_id
@@ -150,7 +150,7 @@ def _get_model_dataframe(
 
     elif model in supervised_models:
         # Load supervised data (default to random_5)
-        supervised_data, _ = get_supervised_scores_data(
+        supervised_data, _ = get_supervised_substitution_data(
             fold_type="random_5",
             cache_dir=cache_dir
         )
@@ -295,7 +295,7 @@ def model_corr_plot(
         - Requires matplotlib for visualization
         - seaborn is optional but recommended for better styling
         - Model names can be from zero-shot, supervised, or AlphaMissense
-        - Use get_zero_shot_model_list() and get_supervised_model_list()
+        - Use available_zero_shot_models() and available_supervised_models()
           to see available models
 
     """
@@ -312,8 +312,8 @@ def model_corr_plot(
 
     # Validate models
     valid_models = (
-        get_zero_shot_model_list() +
-        get_supervised_model_list() +
+        available_zero_shot_models() +
+        available_supervised_models() +
         ["AlphaMissense"]
     )
 
@@ -444,8 +444,8 @@ def get_available_models() -> Dict[str, list]:
         Dictionary with keys 'zero_shot', 'supervised', and 'other'
     """
     return {
-        'zero_shot': get_zero_shot_model_list(),
-        'supervised': get_supervised_model_list(),
+        'zero_shot': available_zero_shot_models(),
+        'supervised': available_supervised_models(),
         'other': ['AlphaMissense']
     }
 
