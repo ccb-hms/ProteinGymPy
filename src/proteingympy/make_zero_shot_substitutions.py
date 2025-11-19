@@ -50,6 +50,8 @@ def get_zero_shot_substitution_data(cache_dir: str = ".cache") -> Dict[str, pd.D
                 if chunk:
                     f.write(chunk)
         print("Download complete.")
+    else:
+        print(f"Zero-shot scores found in cache at {zip_path}")
     
     # Load zero-shot scores
     zeroshot_tables = _load_zero_shot_data(zip_path)
