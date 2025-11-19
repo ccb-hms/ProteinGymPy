@@ -25,7 +25,7 @@ __all__ = [
     'get_supervised_metrics', # summary performance metrics for supervised models
     'get_zero_shot_substitution_data', # raw zero-shot model prediction scores for all DMS substitutions
     'available_zero_shot_models',
-    'get_zero_shot_benchmark_data',
+    'get_zero_shot_metrics', # summary performance metrics for zero-shot models
     'get_benchmark_summary_stats',
     'get_top_models_by_metric',
     'create_complete_metadata_table',
@@ -44,11 +44,12 @@ def main() -> None:
     print("  - get_dms_substitution_data(): Load 217 DMS substitution assays")
     print("  - get_alphamissense_proteingym_data(): Load AlphaMissense pathogenicity scores")
     print("  - get_supervised_substitution_data(): Load supervised model substitution predictions for DMS substitutions")
+    print("  - get_supervised_metrics(): Load semi-supervised benchmarking metrics")
     print("  - get_zero_shot_substitution_data(): Load zero-shot model predictions for DMS substitutions")
-    print("  - get_zero_shot_benchmark_data(): Load benchmarking metrics")
+    print("  - get_zero_shot_metrics(): Load zero-shot benchmarking metrics")
     print("  - get_dms_metadata(): Load DMS assay metadata")
     print("  - create_complete_metadata_table(): Generate dataset metadata")
     print("  - model_corr_plot(): Compare prediction scores between models")
     print("  - get_available_models(): Get list of all available models")
-    print("  - available_models(): Get list of all available zero-shot models for benchmarking")
+    print("  - available_zero_shot_models(): Get list of all available zero-shot models for benchmarking")
     print("  - benchmark_models(): Benchmark zero-shot models on DMS data")
