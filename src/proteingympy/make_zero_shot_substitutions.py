@@ -273,8 +273,9 @@ def filter_zero_shot_by_models(
     
     return filtered_tables
 
-
-def get_zero_shot_metrics(zeroshot_tables: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
+# some random stats about the DataFrame chatbot generated -- dont need.
+# Made function hidden
+def _get_zero_shot_summary_stats(zeroshot_tables: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
     """
     Generate summary statistics for zero-shot data.
     
@@ -329,7 +330,7 @@ if __name__ == "__main__":
         print(f"Columns: {list(sample_df.columns)}")
         
         # Show summary stats
-        stats = get_zero_shot_metrics(zeroshot_data)
+        stats = _get_zero_shot_summary_stats(zeroshot_data)
         print(f"\nSummary Statistics:")
         for key, value in stats.items():
             if key not in ['assay_sizes', 'model_names']:

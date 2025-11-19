@@ -113,7 +113,7 @@ def check_model_argument(models: Union[str, List[str]]) -> None:
         raise ValueError("Select up to 5 models for comparison")
 
 
-from proteingympy.make_zeroshot_dms_benchmarks import get_zero_shot_benchmark_data
+from proteingympy.make_zeroshot_dms_benchmarks import get_zero_shot_metrics
 
 def benchmark_models(
     metric: Optional[str] = None,
@@ -167,7 +167,7 @@ def benchmark_models(
 
     # Load metric tables if not provided
     if metric_tables is None:
-        metric_tables = get_zero_shot_benchmark_data()
+        metric_tables = get_zero_shot_metrics()
 
     if metric not in metric_tables:
         raise KeyError(

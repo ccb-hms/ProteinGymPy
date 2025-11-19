@@ -6,7 +6,7 @@ from .make_alphamissense_supplementary import get_alphamissense_proteingym_data,
 from .make_metadata import create_complete_metadata_table, save_metadata_csv
 from .make_supervised_scores import get_supervised_substitution_data, available_supervised_models
 from .make_zero_shot_substitutions import get_zero_shot_substitution_data, available_zero_shot_models
-from .make_zeroshot_dms_benchmarks import get_zero_shot_benchmark_data, get_benchmark_summary_stats, get_top_models_by_metric
+from .make_zeroshot_dms_benchmarks import get_zero_shot_metrics, get_benchmark_summary_stats, get_top_models_by_metric
 from .model_corr_plot import model_corr_plot, get_available_models
 from .dms_corr_plot import dms_corr_plot
 from .benchmark_models import benchmark_models

@@ -43,7 +43,7 @@ Load other datasets:
 ```python
 from proteingympy import (
     get_alphamissense_proteingym_data,
-    get_zero_shot_benchmark_data,
+    get_zero_shot_metrics,
     get_supervised_substitution_data
 )
 
@@ -51,7 +51,7 @@ from proteingympy import (
 am_data = get_alphamissense_proteingym_data()
 
 # Zero-shot benchmarking metrics  
-benchmarks = get_zero_shot_benchmark_data()
+benchmarks = get_zero_shot_metrics()
 print(f"Available metrics: {list(benchmarks.keys())}")
 
 # Supervised model predictions
@@ -67,7 +67,7 @@ supervised_data, summary = get_supervised_substitution_data("random_5")
 | `get_alphamissense_proteingym_data()` | Load AlphaMissense pathogenicity scores |
 | `get_supervised_substitution_data()` | Load supervised model predictions for DMS subsitutions |
 | `get_zero_shot_substitution_data()` | Load zero-shot model predictions for DMS subsitutions |
-| `get_zero_shot_benchmark_data()` | Load benchmarking metrics |
+| `get_zero_shot_metrics()` | Load zero-shot benchmarking metrics |
 | `Load supervised model predictions for substitutions ()` | Get list of available supervised models |
 | `available_zero_shot_models()` | Get list of available zero-shot models |
 | `create_complete_metadata_table()` | Generate comprehensive metadata |

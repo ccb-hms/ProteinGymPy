@@ -19,7 +19,7 @@ from proteingympy.benchmark_models import (
     benchmark_models,
     available_models,
 )
-from proteingympy.make_zeroshot_dms_benchmarks import get_zero_shot_benchmark_data
+from proteingympy.make_zeroshot_dms_benchmarks import get_zero_shot_metrics
 
 
 # ---------------------------------------------------------

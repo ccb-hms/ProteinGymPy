@@ -14,7 +14,7 @@ from typing import Dict, List, Optional, Any
 import numpy as np
 
 
-def get_zero_shot_benchmark_data(cache_dir: str = ".cache") -> Dict[str, pd.DataFrame]:
+def get_zero_shot_metrics(cache_dir: str = ".cache") -> Dict[str, pd.DataFrame]:
     """
     Download and process ProteinGym zero-shot benchmarking metrics.
     

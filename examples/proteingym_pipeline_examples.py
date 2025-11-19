@@ -25,9 +25,10 @@ from proteingympy import (
     get_alphamissense_summary_stats,
     get_supervised_substitution_data,
     available_supervised_models,
+    get_supervised_metrics,
     get_zero_shot_substitution_data,
     available_zero_shot_models,
-    get_zero_shot_benchmark_data,
+    get_zero_shot_metrics,
     get_benchmark_summary_stats,
     get_top_models_by_metric,
     create_complete_metadata_table
@@ -163,7 +164,7 @@ def example_zero_shot_benchmarks():
     
     print("Loading zero-shot benchmark data...")
     try:
-        benchmark_data = get_zero_shot_benchmark_data(cache_dir=".cache")
+        benchmark_data = get_zero_shot_metrics(cache_dir=".cache")
         
         # Get summary stats
         stats = get_benchmark_summary_stats(benchmark_data)
