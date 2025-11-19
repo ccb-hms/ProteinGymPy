@@ -11,6 +11,9 @@ from .model_corr_plot import model_corr_plot, get_available_models
 from .dms_corr_plot import dms_corr_plot
 from .benchmark_models import benchmark_models
 from .benchmark_models import available_models
+from .plot_dms_heatmap import plot_dms_heatmap
+from .plot_zeroshot_heatmap import plot_zeroshot_heatmap
+from .plot_structure import plot_structure
 
 
 # For convenience, expose the most commonly used functions
@@ -34,6 +37,10 @@ __all__ = [
     'get_available_models',
     'benchmark_models',
     'available_models',
+    'plot_dms_heatmap',
+    'plot_zeroshot_heatmap',
+    'plot_structure',
+    'dms_corr_plot',
     'main'
 ]
 
@@ -50,6 +57,10 @@ def main() -> None:
     print("  - get_dms_metadata(): Load DMS assay metadata")
     print("  - create_complete_metadata_table(): Generate dataset metadata")
     print("  - model_corr_plot(): Compare prediction scores between models")
+    print("  - dms_corr_plot(): Compare DMS scores with model predictions")
     print("  - get_available_models(): Get list of all available models")
     print("  - available_zero_shot_models(): Get list of all available zero-shot models for benchmarking")
     print("  - benchmark_models(): Benchmark zero-shot models on DMS data")
+    print("  - plot_dms_heatmap(): Visualize DMS scores along a protein")
+    print("  - plot_zeroshot_heatmap(): Visualize zero-shot model scores along a protein")
+    print("  - plot_structure(): Visualize protein structure with DMS or model scores")
