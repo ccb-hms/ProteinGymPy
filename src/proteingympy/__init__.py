@@ -9,6 +9,8 @@ from .make_zero_shot_substitutions import get_zero_shot_scores_data, get_zero_sh
 from .make_zeroshot_dms_benchmarks import get_zero_shot_benchmark_data, get_benchmark_summary_stats, get_top_models_by_metric
 from .model_corr_plot import model_corr_plot, get_available_models
 from .dms_corr_plot import dms_corr_plot
+from .benchmark_models import benchmark_models
+from .benchmark_models import available_models
 
 
 # For convenience, expose the most commonly used functions
@@ -29,6 +31,8 @@ __all__ = [
     'save_metadata_csv',
     'model_corr_plot',
     'get_available_models',
+    'benchmark_models',
+    'available_models',
     'main'
 ]
 
@@ -45,3 +49,5 @@ def main() -> None:
     print("  - create_complete_metadata_table(): Generate dataset metadata")
     print("  - model_corr_plot(): Compare prediction scores between models")
     print("  - get_available_models(): Get list of all available models")
+    print("  - available_models(): Get list of all available zero-shot models for benchmarking")
+    print("  - benchmark_models(): Benchmark zero-shot models on DMS data")
