@@ -1,3 +1,6 @@
+ProteinGymPy
+========================
+[![Documentation Status](https://app.readthedocs.org/projects/proteingympy/badge/?version=latest)](https://proteingympy.readthedocs.io/en/latest/)
 # Overview
 ProteinGymPy provides analysis-ready data resources from ProteinGym ([Notin et al., 2023](https://papers.nips.cc/paper_files/paper/2023/file/cac723e5ff29f65e3fcbb0739ae91bee-Paper-Datasets_and_Benchmarks.pdf)) and built-in functionality to visualize the data in Python. ProteinGym comprises a collection of benchmarks for evaluating the performance of models predicting the effect of point mutations. This package provides access to:
 
@@ -129,3 +132,7 @@ uv run mkdocs build
 ```
 Notin, P., A. Kollasch, D. Ritter, L. van Niekerk, S. Paul, H. Spinner, N. Rollins, et al. 2023. “ProteinGym: Large-Scale Benchmarks for Protein Fitness Prediction and Design.” In Advances in Neural Information Processing Systems, edited by A. Oh, T. Neumann, A. Globerson, K. Saenko, M. Hardt, and S. Levine, 36:64331–79. Curran Associates, Inc.
 ```
+.. |docs| image:: https://app.readthedocs.org/projects/docs/badge/?version=latest
+    :alt: Documentation Status
+    :scale: 100%
+    :target: https://proteingympy.readthedocs.io/en/latest/?badge=latest
