@@ -15,8 +15,6 @@ dependencies = [
     "numpy>=1.24.0",
     "matplotlib>=3.10.5",
     "seaborn>=0.13.2",
-    "mkdocs>=1.6.1",
-    "mkdocs-jupyter>=0.25.1",
 ]
 
 [project.scripts]
@@ -30,6 +28,8 @@ visualization = [
 ]
 mkdocs = [
     "mkdocs>=1.6.1",
+    "mkdocs-jupyter>=0.25.1",
+    "mkdocstrings[python]>=0.18",
 ]
 
 [build-system]
