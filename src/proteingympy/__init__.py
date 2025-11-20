@@ -25,7 +25,6 @@ __all__ = [
     'get_alphamissense_summary_stats',
     'get_supervised_substitution_data', # raw supervised model prediction scores for all DMS substitutions
     'available_supervised_models',
-    'get_supervised_metrics', # summary performance metrics for supervised models
     'get_zero_shot_substitution_data', # raw zero-shot model prediction scores for all DMS substitutions
     'available_zero_shot_models',
     'get_zero_shot_metrics', # summary performance metrics for zero-shot models
