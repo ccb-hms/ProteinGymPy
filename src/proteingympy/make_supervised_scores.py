@@ -270,50 +270,89 @@ def _clean_supervised_column_names(supervised_tables: Dict[str, pd.DataFrame]) -
     return cleaned_tables
 
 
-def get_supervised_metrics(cache_dir: str) -> pd.DataFrame:
+def _load_from_zenodo_v12_supervised(cache_dir: str) -> pd.DataFrame:
     """
-    Load supervised model summary metrics.
+    Download and load the merged supervised DMS benchmark scores (Zenodo v1.2).
+    
+    Steps:
+      - Downloads the zip file containing DMS scores if not already cached.
+      - Opens the ZIP and loads 'merged_scores_substitutions_DMS.csv'.
     
     Args:
-        cache_dir: Directory containing cached files
+        cache_dir (str): Directory where the ZIP file is stored or downloaded.
+    
+    Returns:
+        pandas.DataFrame: The merged scores table.
+    """
+
+    url = (
+        "https://zenodo.org/records/14997691/files/"
+        "DMS_supervised_substitutions_scores.zip?download=1"
+    )
+
+    zip_path = os.path.join(cache_dir, "DMS_supervised_substitutions_scores.zip")
+    target_file = "DMS_supervised_substitutions_scores/merged_scores_substitutions_DMS.csv"
+
+    # --------------------------------------------------------------
+    # 1. Download the ZIP if missing
+    # --------------------------------------------------------------
+    if not os.path.exists(zip_path):
+        print(f"Downloading benchmark ZIP from: {url}")
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+
+        os.makedirs(cache_dir, exist_ok=True)
+        with open(zip_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+
+        print("Download complete.")
+
+    # --------------------------------------------------------------
+    # 2. Open ZIP and load the target CSV
+    # --------------------------------------------------------------
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+        zip_contents = zip_ref.namelist()
+
+        if target_file not in zip_contents:
+            raise FileNotFoundError(
+                f"'{target_file}' was not found inside the ZIP archive.\n"
+                f"Available files: {zip_contents}"
+            )
+
+        with zip_ref.open(target_file) as f:
+            df = pd.read_csv(f)
+
+    return df
+
+
+def get_supervised_metrics(cache_dir: str = ".cache") -> pd.DataFrame:
+    """
+    Load supervised DMS benchmark metrics (Zenodo v1.2).
+    
+    This function:
+      - Ensures the cache directory exists
+      - Downloads the benchmark ZIP if missing
+      - Loads 'merged_scores_substitutions_DMS.csv'
+      - Returns it as a pandas DataFrame
+    
+    Args:
+        cache_dir (str, optional): Directory to store or read cached files.
+                                   Defaults to ".cache".
         
     Returns:
-        DataFrame with summary metrics
+        pandas.DataFrame: The merged supervised benchmark scores.
     """
-    summary_path = os.path.join(cache_dir, "merged_scores_substitutions_DMS.csv")
-    
-    if not os.path.exists(summary_path):
-        print(f"Summary metrics file not found at {summary_path}")
-        return pd.DataFrame()
-    
-    # Load summary table
-    summary_df = pd.read_csv(summary_path)
-    
-    # Clean model names
-    if 'model_name' in summary_df.columns:
-        summary_df['model_name'] = (summary_df['model_name']
-                                   .str.replace('-', '_')
-                                   .str.replace(' ', '')
-                                   .str.replace('_predictions', ''))
-    
-    # Add UniProt IDs (simplified mapping)
-    if 'DMS_id' in summary_df.columns:
-        # Extract entry names and add UniProt mapping
-        entry_names = []
-        for dms_id in summary_df['DMS_id']:
-            parts = dms_id.split('_')
-            entry_name = f"{parts[0]}_{parts[1]}" if len(parts) >= 2 else parts[0]
-            entry_names.append(entry_name)
-        
-        uniprot_mapping = _get_basic_uniprot_mapping(entry_names)
-        summary_df['UniProt_id'] = [uniprot_mapping.get(en) for en in entry_names]
-        
-        # Reorder columns
-        cols_order = ['UniProt_id', 'DMS_id', 'model_name', 'fold_variable_name', 'Spearman', 'MSE']
-        available_cols = [col for col in cols_order if col in summary_df.columns]
-        summary_df = summary_df[available_cols]
-    
-    return summary_df
+
+    # Normalize and create cache directory if necessary
+    cache_dir = os.path.abspath(cache_dir)
+    os.makedirs(cache_dir, exist_ok=True)
+
+    # Load merged scores via helper function
+    benchmark_table = _load_from_zenodo_v12_supervised(cache_dir)
+
+    return benchmark_table
 
 
 def available_supervised_models() -> List[str]:
@@ -323,14 +362,14 @@ def available_supervised_models() -> List[str]:
     Returns:
         List of model names
     """
-    # 12 semi-supervised models available in ProteinGym v1.2
+    # 11 semi-supervised models available in ProteinGym v1.2
     models = [
-        "OHE_Notaugmented", "normalized_targets", 
-             "OHE_Augmented_DeepSequence", "OHE_Augmented_ESM1v", 
-             "OHE_Augmented_MSATransformer", "OHE_Augmented_Tranception", 
-             "OHE_Augmented_TranceptEVE", "Embeddings_Augmented_ESM1v", 
-             "Embeddings_Augmented_MSATransformer", 
-             "Embeddings_Augmented_Tranception", "ProteinNPT", "Kermut"
+        'Embeddings - Augmented - ESM1v',
+        'Embeddings - Augmented - MSA Transformer',
+        'Embeddings - Augmented - Tranception', 'Kermut',
+        'OHE - Augmented - DeepSequence', 'OHE - Augmented - ESM1v',
+        'OHE - Augmented - MSA Transformer', 'OHE - Augmented - TranceptEVE',
+        'OHE - Augmented - Tranception', 'OHE - Not augmented', 'ProteinNPT'
     ]
     return models
 
