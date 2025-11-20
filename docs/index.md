@@ -78,6 +78,9 @@ supervised_data, summary = get_supervised_substitution_data("random_5")
 | `plot_structure()` | Visualize DMS or model scores on 3D protein structure |
 
 
+
+
+
 ## Running Examples
 
 ### Quick Demo (No Downloads)

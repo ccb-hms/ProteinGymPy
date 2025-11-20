@@ -110,6 +110,21 @@ The tests include:
 - Mock tests that don't require network access
 - Validation of data structure and consistency
 
+## Documentation building
+
+This project uses [Mkdocs](https://www.mkdocs.org/) as a project document builder. Static docs can be built by installing the extra dependencies
+after cloning the repo
+```bash
+#git clone https://github.com/ccb-hms/ProteinGymPy.git
+cd ProteinGymPy
+uv sync --extra mkdocs
+uv run mkdocs build
+
+```
+
+
+
+
 ## Citation
 ```
 Notin, P., A. Kollasch, D. Ritter, L. van Niekerk, S. Paul, H. Spinner, N. Rollins, et al. 2023. “ProteinGym: Large-Scale Benchmarks for Protein Fitness Prediction and Design.” In Advances in Neural Information Processing Systems, edited by A. Oh, T. Neumann, A. Globerson, K. Saenko, M. Hardt, and S. Levine, 36:64331–79. Curran Associates, Inc.
