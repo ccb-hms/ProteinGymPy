@@ -3,8 +3,10 @@ theme:
   name: readthedocs
 
 markdown_extensions:
+  - toc:
+      permalink: true
   - md_in_html
-
+  
 plugins:
   - search
   - mkdocs-jupyter
@@ -16,21 +18,6 @@ nav:
   - Vignettes:
     - Data Import and Representation: data_importation_and_representation.ipynb
     - Data Visualization and Exploration: visualization_exploration.ipynb
-  - Reference:
-    - get_dms_substitution_data: reference/get_dms_substitution_data.md
-    - get_dms_metadata: reference/get_dms_metadata.md
-    - get_alphamissense_proteingym_data: reference/get_alphamissense_proteingym_data.md
-    - get_supervised_substitution_data: reference/get_supervised_substitution_data.md
-    - available_supervised_models: reference/available_supervised_models.md
-    - get_zero_shot_substitution_data: reference/get_zero_shot_substitution_data.md
-    - available_zero_shot_models: reference/available_zero_shot_models.md
-    - get_zero_shot_metrics: reference/get_zero_shot_metrics.md
-    - create_complete_metadata_table: reference/create_complete_metadata_table.md
-    - benchmark_models: reference/benchmark_models.md
-    - dms_corr_plot: reference/dms_corr_plot.md
-    - model_corr_plot: reference/model_corr_plot.md
-    - plot_dms_heatmap: reference/plot_dms_heatmap.md
-    - plot_structure: reference/plot_structure.md
   - About:
     - License: LICENSE
     - Citation: CITATION.md
