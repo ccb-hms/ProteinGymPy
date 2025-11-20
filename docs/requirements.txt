@@ -437,3 +437,4 @@ websocket-client==1.9.0
     # via jupyter-server
 widgetsnbextension==4.0.15
     # via ipywidgets
+git+https://github.com/ccb-hms/ProteinGymPy.git#egg=ProteinGymPy
