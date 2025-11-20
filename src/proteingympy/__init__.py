@@ -4,13 +4,12 @@ from .data_import_funcs import get_dms_substitution_zip
 from .make_dms_substitutions import get_dms_substitution_data, get_dms_metadata
 from .make_alphamissense_supplementary import get_alphamissense_proteingym_data, get_alphamissense_summary_stats
 from .make_metadata import create_complete_metadata_table, save_metadata_csv
-from .make_supervised_scores import get_supervised_substitution_data, available_supervised_models
+from .make_supervised_scores import get_supervised_substitution_data, get_supervised_metrics, available_supervised_models
 from .make_zero_shot_substitutions import get_zero_shot_substitution_data, available_zero_shot_models
 from .make_zeroshot_dms_benchmarks import get_zero_shot_metrics, get_benchmark_summary_stats, get_top_models_by_metric
 from .model_corr_plot import model_corr_plot, get_available_models
 from .dms_corr_plot import dms_corr_plot
-from .benchmark_models import benchmark_models
-from .benchmark_models import available_models
+from .benchmark_models import benchmark_models, available_models
 
 
 # For convenience, expose the most commonly used functions
