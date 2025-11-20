@@ -289,14 +289,14 @@ def available_supervised_models() -> List[str]:
     Returns:
         List of model names
     """
-    # 12 semi-supervised models available in ProteinGym v1.2
+    # 11 semi-supervised models available in ProteinGym v1.2
     models = [
-        "OHE_Notaugmented", "normalized_targets", 
-             "OHE_Augmented_DeepSequence", "OHE_Augmented_ESM1v", 
-             "OHE_Augmented_MSATransformer", "OHE_Augmented_Tranception", 
-             "OHE_Augmented_TranceptEVE", "Embeddings_Augmented_ESM1v", 
-             "Embeddings_Augmented_MSATransformer", 
-             "Embeddings_Augmented_Tranception", "ProteinNPT", "Kermut"
+        'Embeddings - Augmented - ESM1v',
+        'Embeddings - Augmented - MSA Transformer',
+        'Embeddings - Augmented - Tranception', 'Kermut',
+        'OHE - Augmented - DeepSequence', 'OHE - Augmented - ESM1v',
+        'OHE - Augmented - MSA Transformer', 'OHE - Augmented - TranceptEVE',
+        'OHE - Augmented - Tranception', 'OHE - Not augmented', 'ProteinNPT'
     ]
     return models
 

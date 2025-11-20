@@ -27,49 +27,35 @@ def available_models():
     Equivalent to the R function `available_models()`.
     """
     models = [
-        "Site_Independent", "EVmutation",
-        "DeepSequence_single", "DeepSequence_ensemble",
-        "EVE_single", "EVE_ensemble",
-        "Unirep", "Unirep_evotune",
-        "MSA_Transformer_single", "MSA_Transformer_ensemble",
-        "ESM1b", "ESM1v_single",
-        "ESM1v_ensemble", "ESM2_8M",
-        "ESM2_35M", "ESM2_150M",
-        "ESM2_650M", "ESM2_3B",
-        "ESM2_15B", "Wavenet",
-        "RITA_s", "RITA_m",
-        "RITA_l", "RITA_xl",
-        "Progen2_small", "Progen2_medium",
-        "Progen2_base", "Progen2_large",
-        "Progen2_xlarge", "GEMME",
-        "VESPA", "VESPAl",
-        "VespaG", "ProtGPT2",
-        "Tranception_S_no_retrieval", "Tranception_M_no_retrieval",
-        "Tranception_L_no_retrieval", "Tranception_S",
-        "Tranception_M", "Tranception_L",
-        "TranceptEVE_S", "TranceptEVE_M",
-        "TranceptEVE_L", "CARP_38M",
-        "CARP_600K", "CARP_640M",
-        "CARP_76M", "MIF",
-        "MIFST", "ESM_IF1",
-        "ProteinMPNN", "ProtSSN_k10_h512",
-        "ProtSSN_k10_h768", "ProtSSN_k10_h1280",
-        "ProtSSN_k20_h512", "ProtSSN_k20_h768",
-        "ProtSSN_k20_h1280", "ProtSSN_k30_h512",
-        "ProtSSN_k30_h768", "ProtSSN_k30_h1280",
-        "ProtSSN_ensemble", "SaProt_650M_AF2",
-        "SaProt_35M_AF2", "PoET",
-        "MULAN_small", "ProSST_20",
-        "ProSST_128", "ProSST_512",
-        "ProSST_1024", "ProSST_2048",
-        "ProSST_4096", "ESCOTT",
-        "VenusREM", "RSALOR",
-        "S2F", "S2F_MSA",
-        "S3F", "S3F_MSA",
-        "SiteRM"
+       'Site_Independent', 'EVmutation', 'DeepSequence_single',
+       'DeepSequence_ensemble', 'EVE_single', 'EVE_ensemble', 'Unirep',
+       'Unirep_evotuned', 'MSA_Transformer_single', 'MSA_Transformer_ensemble',
+       'ESM_1b', 'ESM_1v_single', 'ESM_1v_ensemble', 'ESM2_8M', 'ESM2_35M',
+       'ESM2_150M', 'ESM2_650M', 'ESM2_3B', 'ESM2_15B', 'Wavenet', 'RITA_S',
+       'RITA_M', 'RITA_L', 'RITA_XL', 'Progen2_S', 'Progen2_M', 'Progen2_Base',
+       'Progen2_L', 'Progen2_XL', 'GEMME', 'VESPA', 'VESPAl', 'VespaG',
+       'ProtGPT2', 'Tranception_S_no_retrieval', 'Tranception_M_no_retrieval',
+       'Tranception_L_no_retrieval', 'Tranception_S', 'Tranception_M',
+       'Tranception_L', 'TranceptEVE_S', 'TranceptEVE_M', 'TranceptEVE_L',
+       'CARP_38M', 'CARP_600K', 'CARP_640M', 'CARP_76M', 'MIF', 'MIF_ST',
+       'ESM_IF1', 'ProteinMPNN', 'ProtSSN_k_10_h_512', 'ProtSSN_k_10_h_768',
+       'ProtSSN_k_10_h_1280', 'ProtSSN_k_20_h_512', 'ProtSSN_k_20_h_768',
+       'ProtSSN_k_20_h_1280', 'ProtSSN_k_30_h_512', 'ProtSSN_k_30_h_768',
+       'ProtSSN_k_30_h_1280', 'ProtSSN_ensemble', 'SaProt_650M', 'SaProt_35M',
+       'PoET_200M', 'MULAN', 'ProSST_K_20', 'ProSST_K_128', 'ProSST_K_512',
+       'ProSST_K_1024', 'ProSST_K_2048', 'ProSST_K_4096', 'ESCOTT', 'VenusREM',
+       'RSALOR', 'S2F', 'S2F_MSA', 'S3F', 'S3F_MSA', 'SiteRM'
     ]
     return models
 
+
+from typing import List, Union
+
+def normalize_model_names(models: Union[str, List[str]]) -> List[str]:
+    """Normalize model names to match DataFrame / available_models format."""
+    if isinstance(models, str):
+        models = [models]
+    return [m.strip().replace(" ", "_").lower() for m in models]
 
 from typing import Iterable, List, Union
 
@@ -96,13 +82,17 @@ def check_metric_argument(user_metric: str) -> None:
 from typing import List, Union
 
 def check_model_argument(models: Union[str, List[str]]) -> None:
+
+    models = normalize_model_names(models)
+
     # Accept either a string or a list
     if isinstance(models, str):
         models = [models]
 
     # Combine both sets of valid models
     valid_models = available_models()
-
+    valid_models = normalize_model_names(valid_models)
+    
     # Check validity
     invalid_models = [m for m in models if m not in valid_models]
     if invalid_models:
@@ -129,12 +119,10 @@ def benchmark_models(
         One of "AUC", "MCC", "NDCG", "Spearman", "Top_recall".
         If not provided, defaults to "Spearman" with a printed message.
     models : list of str, optional
-        A list (up to 5) of model names to compare. If None, defaults to
-        available_models() (but check_model_argument will fail if >5).
+        A list (up to 5) of model names to compare. If None, must provide at least one.
     metric_tables : dict, optional
         A dict mapping metric name -> pandas.DataFrame. If not provided, the
-        function will attempt to call zeroshot_DMS_metrics() which tries to
-        read a 'zeroshot_DMS_metrics.pkl' in the same folder.
+        function will call get_zero_shot_metrics().
 
     Returns
     -------
@@ -142,30 +130,26 @@ def benchmark_models(
         The figure containing the plot.
     """
 
-    # dependency checks are already covered at import, but keep a small runtime check
-    for pkg in ("seaborn", "matplotlib", "pandas", "numpy"):
-        # these are already imported above; this loop ensures consistent error message if missing
-        pass
-
-    # Handle metric defaulting
+    # Default metric
     if metric is None:
         print("No metric specified. Using default Spearman correlation")
         metric = "Spearman"
     else:
         check_metric_argument(metric)
 
-    # Handle models argument
+    # Ensure models argument is provided
     if models is None:
         raise ValueError("Select at least one model from available_models()")
 
-    # Normalize here so downstream code always sees a list
+    # Normalize models input
     if isinstance(models, str):
         models = [models]
+    models_normalized = [m.strip().replace(" ", "_").lower() for m in models]
 
-    check_model_argument(models)
+    # Check models are valid
+    check_model_argument(models_normalized)
 
-
-    # Load metric tables if not provided
+    # Load metric tables
     if metric_tables is None:
         metric_tables = get_zero_shot_metrics()
 
@@ -176,18 +160,27 @@ def benchmark_models(
 
     selected_table = metric_tables[metric]
 
-    # Ensure selected_table is a DataFrame
+    # Ensure DataFrame
     if not isinstance(selected_table, pd.DataFrame):
         raise ValueError("Each metric in metric_tables must be a pandas.DataFrame")
 
-    # Select columns (models); raise if missing columns
-    missing_cols = [m for m in models if m not in selected_table.columns]
+    # Normalize DataFrame columns for matching
+    selected_table.columns = (
+        selected_table.columns
+        .str.strip()
+        .str.replace(r"\s+", "_", regex=True)
+        .str.lower()
+    )
+
+    # Check missing columns
+    missing_cols = [m for m in models_normalized if m not in selected_table.columns]
     if missing_cols:
         raise KeyError(f"Selected model(s) not present in metric table: {missing_cols}")
 
-    selected_table = selected_table.loc[:, models]
+    # Select columns
+    selected_table = selected_table.loc[:, models_normalized]
 
-    # If Spearman, take absolute value (matches R behavior)
+    # If Spearman, take absolute value
     if metric == "Spearman":
         res = selected_table.abs()
     else:
@@ -200,42 +193,46 @@ def benchmark_models(
     model_means = res_long.groupby("model", observed=True)["score"].mean()
     ordered_models = list(model_means.sort_values(ascending=False).index)
 
-    # Make 'model' a categorical with that order (so seaborn uses the order)
-    res_long["model"] = pd.Categorical(res_long["model"], categories=ordered_models, ordered=True)
+    # Map normalized model names back to original names
+    normalized_to_original = {
+        m.strip().replace(" ", "_").lower(): m for m in available_models()
+    }
+    res_long["model"] = res_long["model"].map(normalized_to_original)
+    ordered_models_original = [normalized_to_original[m] for m in ordered_models]
 
-    # Plotting: approximate half-eye with violin + narrow boxplot + jitter
+    # Set categorical order
+    res_long["model"] = pd.Categorical(
+        res_long["model"], categories=ordered_models_original, ordered=True
+    )
+
+    # Plotting
     sns.set(style="whitegrid")
-    n_models = len(ordered_models)
+    n_models = len(ordered_models_original)
     fig_width = max(8, n_models * 1.2)
     fig, ax = plt.subplots(figsize=(fig_width, 6))
 
-    # ggplot2 default discrete palette (first 5 colors)
     ggplot2_colors = ["#F8766D", "#E6D922", "#10C876", "#029FD3", "#C77CFF"]
+    palette = ggplot2_colors[:n_models]
 
-    # Use only as many as needed (n_models ≤ 5)
-    palette = ggplot2_colors[:n_models] 
-
-    # Violin (approximate half-eye)
     sns.violinplot(
         x="model",
         y="score",
         data=res_long,
-        order=ordered_models,
+        order=ordered_models_original,
         ax=ax,
         inner=None,
         cut=0,
         palette=palette,
         linewidth=0.8,
         hue="model",
-        legend=False 
+        legend=False
     )
 
-    # Narrow boxplot on top
     sns.boxplot(
         x="model",
         y="score",
         data=res_long,
-        order=ordered_models,
+        order=ordered_models_original,
         ax=ax,
         width=0.2,
         linewidth=1,
@@ -245,12 +242,11 @@ def benchmark_models(
         orient="vertical"
     )
 
-    # Jittered points
     sns.stripplot(
         x="model",
         y="score",
         data=res_long,
-        order=ordered_models,
+        order=ordered_models_original,
         ax=ax,
         color="k",
         size=3,
@@ -264,8 +260,8 @@ def benchmark_models(
     ax.tick_params(axis="x", labelrotation=15, labelsize=12)
     ax.tick_params(axis="y", labelsize=12)
 
-    # Remove legend (in R plot legend shows models but it's redundant here)
+    # Remove legend
     ax.get_legend() and ax.get_legend().remove()
-
     plt.tight_layout()
+
     return fig
