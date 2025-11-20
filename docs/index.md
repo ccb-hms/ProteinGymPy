@@ -62,20 +62,20 @@ supervised_data, summary = get_supervised_substitution_data("random_5")
 
 | Function | Description |
 |----------|-------------|
-| `get_dms_substitution_data()` | Load 217 DMS substitution assays |
-| `get_dms_metadata()` | Load DMS assay metadata/reference file |
-| `get_alphamissense_proteingym_data()` | Load AlphaMissense pathogenicity scores |
-| `get_supervised_substitution_data()` | Load supervised model predictions for DMS subsitutions |
-| `get_zero_shot_substitution_data()` | Load zero-shot model predictions for DMS subsitutions |
-| `get_zero_shot_metrics()` | Load zero-shot benchmarking metrics |
-| `Load supervised model predictions for substitutions ()` | Get list of available supervised models |
-| `available_zero_shot_models()` | Get list of available zero-shot models |
-| `create_complete_metadata_table()` | Generate comprehensive metadata |
-| `benchmark_models()` | Benchmark multiple variant effect prediction models |
-| `dms_corr_plot()` | Correlate model performance and DMS scores|
-| `model_corr_plot()` | Compare two model performance scores |
-| `plot_dms_heatmap()` | Visualize DMS scores along a protein as a heatmap |
-| `plot_structure()` | Visualize DMS or model scores on 3D protein structure |
+| [`get_dms_substitution_data()`](reference/get_dms_substitution_data.md) | Load 217 DMS substitution assays |
+| [`get_dms_metadata()`](reference/get_dms_metadata.md) | Load DMS assay metadata/reference file |
+| [`get_alphamissense_proteingym_data()`](reference/get_alphamissense_proteingym_data.md) | Load AlphaMissense pathogenicity scores |
+| [`get_supervised_substitution_data()`](reference/get_supervised_substitution_data.md) | Load supervised model predictions for DMS subsitutions |
+| [`get_zero_shot_substitution_data()`](reference/get_zero_shot_substitution_data.md) | Load zero-shot model predictions for DMS subsitutions |
+| [`get_zero_shot_metrics()`](reference/get_zero_shot_metrics.md) | Load zero-shot benchmarking metrics |
+| [`available_supervised_models()`](reference/available_supervised_models.md) | Get list of available supervised models |
+| [`available_zero_shot_models()`](reference/available_zero_shot_models.md) | Get list of available zero-shot models |
+| [`create_complete_metadata_table()`](reference/create_complete_metadata_table.md) | Generate comprehensive metadata |
+| [`benchmark_models()`](reference/benchmark_models.md) | Benchmark multiple variant effect prediction models |
+| [`dms_corr_plot()`](reference/dms_corr_plot.md) | Correlate model performance and DMS scores|
+| [`model_corr_plot()`](reference/model_corr_plot.md) | Compare two model performance scores |
+| [`plot_dms_heatmap()`](reference/plot_dms_heatmap.md) | Visualize DMS scores along a protein as a heatmap |
+| [`plot_structure()`](reference/plot_structure.md) | Visualize DMS or model scores on 3D protein structure |
 
 
 
