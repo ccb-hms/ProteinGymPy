@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 from typing import Dict, List, Optional, Any
 import re
-from .uniprot_utils import _query_uniprot_api
+from .data_import_funcs import _query_uniprot_api
 
 
 def get_zero_shot_substitution_data(cache_dir: str = ".cache") -> Dict[str, pd.DataFrame]:

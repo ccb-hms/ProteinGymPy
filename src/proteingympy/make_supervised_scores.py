@@ -12,7 +12,7 @@ import tempfile
 import zipfile
 from typing import Dict, List, Optional, Tuple
 import re
-from .uniprot_utils import _query_uniprot_api
+from .data_import_funcs import _query_uniprot_api
 
 
 def get_supervised_substitution_data(

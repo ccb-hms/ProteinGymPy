@@ -11,7 +11,7 @@ import requests
 from typing import Dict, List, Optional
 import tempfile
 import zipfile
-from .uniprot_utils import _query_uniprot_api
+from .data_import_funcs import _query_uniprot_api
 
 
 def get_dms_substitution_data(cache_dir: str = ".cache", use_cache: bool = True) -> Dict[str, pd.DataFrame]:
