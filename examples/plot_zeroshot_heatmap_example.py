@@ -26,20 +26,20 @@ def create_example_data():
     import numpy as np
     
     # Create synthetic data for a protein with positions 1-50
-    mutations = []
-    for pos in range(1, 51):
-        for ref_aa in ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 
-                       'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']:
-            for alt_aa in ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 
-                          'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']:
-                if ref_aa != alt_aa:  # Skip identity mutations
-                    mutant = f"{ref_aa}{pos}{alt_aa}"
-                    mutations.append({
-                        'mutant': mutant,
-                        'ESM1v': np.random.randn() * 2,  # Random model scores
-                        'EVE': np.random.randn() * 2,
-                        'AlphaMissense': np.random.uniform(0, 1)
-                    })
+    AMINO_ACIDS = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
+                   'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
+    mutations = [
+        {
+            'mutant': f'{ref_aa}{pos}{alt_aa}',
+            'ESM1v': np.random.randn() * 2,
+            'EVE': np.random.randn() * 2,
+            'AlphaMissense': np.random.uniform(0, 1)
+        }
+        for pos in range(1, 51)
+        for ref_aa in AMINO_ACIDS
+        for alt_aa in AMINO_ACIDS
+        if ref_aa != alt_aa
+    ]
     
     df = pd.DataFrame(mutations)
     
