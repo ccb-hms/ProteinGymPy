@@ -1,6 +1,6 @@
 [project]
 name = "ProteinGymPy"
-version = "0.1.0"
+version = "0.9.1"
 description = "Programmatic access to ProteinGym datasets with visualization tools."
 readme = "README.md"
 authors = [
