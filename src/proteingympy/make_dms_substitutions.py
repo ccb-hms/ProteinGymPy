@@ -5,51 +5,41 @@ Downloads and processes ProteinGym DMS substitution data.
 Loads 217 DMS substitution assays with UniProt ID mapping.
 """
 
-import os
 import pandas as pd
 import requests
 from typing import Dict, List, Optional
-import tempfile
+from pathlib import Path
 import zipfile
 
+from .data_import_funcs import cached_download, get_cache_dir
 
-def get_dms_substitution_data(cache_dir: str = ".cache", use_cache: bool = True) -> Dict[str, pd.DataFrame]:
+
+def get_dms_substitution_data(cache_dir: str = None, use_cache: bool = True) -> Dict[str, pd.DataFrame]:
     """
     Download and process ProteinGym DMS substitution data.
-    
+
     Returns a dictionary of 217 DMS assays, each as a pandas DataFrame with columns:
-    - UniProt_id: UniProt accession identifier  
+    - UniProt_id: UniProt accession identifier
     - DMS_id: DMS assay identifier
     - mutant: substitution description (e.g. A1P:D2N)
     - mutated_sequence: full amino acid sequence
     - DMS_score: experimental measurement (higher = more fit)
     - DMS_score_bin: binary fitness (1=fit, 0=not fit)
-    
+
     Args:
-        cache_dir: Directory to cache downloaded files
+        cache_dir: Directory to cache downloaded files (uses default if None)
         use_cache: If True, use cached file if it exists. If False, force a fresh download.
-        
+
     Returns:
         Dictionary mapping DMS study names to DataFrames
     """
-    os.makedirs(cache_dir, exist_ok=True)
-    zip_path = os.path.join(cache_dir, "DMS_ProteinGym_substitutions.zip")
-    
-    # Download if not cached or if use_cache is False
-    if not use_cache or not os.path.exists(zip_path):
-        if os.path.exists(zip_path):
-            os.remove(zip_path)
-        url = "https://zenodo.org/records/15293562/files/DMS_ProteinGym_substitutions.zip"
-        print(f"Downloading {url} to {zip_path}...")
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-        with open(zip_path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-        print("Download complete.")
-    else:
-        print(f"Using cached file at {zip_path}.")
+    # Download using centralized caching utility
+    zip_path = cached_download(
+        url="https://zenodo.org/records/15293562/files/DMS_ProteinGym_substitutions.zip",
+        filename="DMS_ProteinGym_substitutions.zip",
+        cache_dir=cache_dir,
+        use_cache=use_cache
+    )
     
     # Extract and load data
     progym_tables = {}
@@ -194,30 +184,24 @@ def _get_basic_uniprot_mapping(entry_names: List[str]) -> Dict[str, Optional[str
     return mapping
 
 
-def get_dms_metadata(cache_dir: str = ".cache") -> pd.DataFrame:
+def get_dms_metadata(cache_dir: str = None) -> pd.DataFrame:
     """
     Download and process DMS substitutions metadata/reference file.
-    
+
     Args:
-        cache_dir: Directory to cache downloaded files
-        
+        cache_dir: Directory to cache downloaded files (uses default if None)
+
     Returns:
         DataFrame with metadata for 217 DMS assays
     """
-    os.makedirs(cache_dir, exist_ok=True)
-    metadata_path = os.path.join(cache_dir, "DMS_substitutions.csv")
-    
-    if not os.path.exists(metadata_path):
-        url = "https://zenodo.org/records/15293562/files/DMS_substitutions.csv"
-        print(f"Downloading metadata from {url}...")
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-        with open(metadata_path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-        print("Metadata download complete.")
-    
+    # Download using centralized caching utility
+    metadata_path = cached_download(
+        url="https://zenodo.org/records/15293562/files/DMS_substitutions.csv",
+        filename="DMS_substitutions.csv",
+        cache_dir=cache_dir,
+        use_cache=True  # Metadata rarely changes, always use cache
+    )
+
     # Load and process metadata
     df = pd.read_csv(metadata_path)
     

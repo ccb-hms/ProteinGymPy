@@ -6,13 +6,15 @@ Downloads and processes AlphaMissense pathogenicity scores for ProteinGym varian
 
 import io
 import json
-import os
 import re
 import zipfile
 from typing import Dict, Optional
+from pathlib import Path
 
 import pandas as pd
 import requests
+
+from .data_import_funcs import cached_download, get_cache_dir
 
 
 def _is_proteingym_csv(member_name: str) -> bool:
@@ -97,14 +99,14 @@ def _query_uniprot_accessions(entry_names, session: Optional[requests.Session] =
     return results
 
 
-def _add_uniprot_accessions(df: pd.DataFrame, cache_dir: str) -> pd.DataFrame:
+def _add_uniprot_accessions(df: pd.DataFrame, cache_dir: Optional[str]) -> pd.DataFrame:
     """Augment AlphaMissense data with UniProt accessions via the UniProt REST API."""
     entry_col = 'Uniprot_ID'
     if entry_col not in df.columns:
         return df
 
-    cache_path = os.path.join(cache_dir, "alphamissense_uniprot_mapping.json")
-    cached_mapping = _load_cached_uniprot_mapping(cache_path)
+    cache_path = get_cache_dir(cache_dir) / "alphamissense_uniprot_mapping.json"
+    cached_mapping = _load_cached_uniprot_mapping(str(cache_path))
 
     entry_names = sorted(df[entry_col].dropna().unique())
     missing = [entry for entry in entry_names if cached_mapping.get(entry) in (None, '')]
@@ -122,7 +124,7 @@ def _add_uniprot_accessions(df: pd.DataFrame, cache_dir: str) -> pd.DataFrame:
 
         # Merge fetched results into cache
         cached_mapping.update({entry: fetched.get(entry, cached_mapping.get(entry)) for entry in missing})
-        _save_uniprot_mapping(cache_path, cached_mapping)
+        _save_uniprot_mapping(str(cache_path), cached_mapping)
 
     df = df.copy()
     df['SwissProt_ID'] = df[entry_col]
@@ -142,7 +144,7 @@ def _add_uniprot_accessions(df: pd.DataFrame, cache_dir: str) -> pd.DataFrame:
         }
         if derived_mapping:
             cached_mapping.update(derived_mapping)
-            _save_uniprot_mapping(cache_path, cached_mapping)
+            _save_uniprot_mapping(str(cache_path), cached_mapping)
 
         missing_mask = df[entry_col].isna()
 
@@ -170,45 +172,47 @@ def _derive_accession_from_entry(entry_name: str) -> Optional[str]:
     return None
 
 
-def get_alphamissense_proteingym_data(cache_dir: str = ".cache") -> pd.DataFrame:
+def get_alphamissense_proteingym_data(cache_dir: str = None) -> pd.DataFrame:
     """
     Download and process AlphaMissense supplementary data for ProteinGym variants.
-    
-    This loads Table S8 from Cheng et al. 2023 containing AlphaMissense pathogenicity 
-    scores for ~1.6M variants that match those in ProteinGym from 87 DMS experiments 
+
+    This loads Table S8 from Cheng et al. 2023 containing AlphaMissense pathogenicity
+    scores for ~1.6M variants that match those in ProteinGym from 87 DMS experiments
     across 72 proteins.
-    
+
     Args:
-        cache_dir: Directory to cache downloaded files
-        
+        cache_dir: Directory to cache downloaded files (uses default if None)
+
     Returns:
     DataFrame with columns:
-    - DMS_id: DMS assay identifier  
+    - DMS_id: DMS assay identifier
         - Uniprot_ID: UniProt accession (resolved via UniProt API)
         - SwissProt_ID: Original AlphaMissense SwissProt entry name
     - variant_id: Variant identifier
     - AlphaMissense: Pathogenicity score (0-1, higher = more pathogenic)
     """
-    os.makedirs(cache_dir, exist_ok=True)
-    
+    # Get cache directory path
+    cache_path = get_cache_dir(cache_dir)
+    cache_path.mkdir(parents=True, exist_ok=True)
+
     # File paths
-    csv_path = os.path.join(cache_dir, "Supplementary_Data_S8_proteingym.csv")
+    csv_path = cache_path / "Supplementary_Data_S8_proteingym.csv"
 
     #url = "https://www.science.org/doi/suppl/10.1126/science.adg7492/suppl_file/science.adg7492_data_s1_to_s9.zip"
     # Science is blocking requests with TLS fingerprinting, so we rely on a local copy
     # Preferred zip path is the copy bundled with the package at src/
-    repo_zip_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "science.adg7492_data_s1_to_s9.zip"))
-    cache_zip_path = os.path.join(cache_dir, "science.adg7492_data_s1_to_s9.zip")
+    repo_zip_path = Path(__file__).parent.parent / "science.adg7492_data_s1_to_s9.zip"
+    cache_zip_path = cache_path / "science.adg7492_data_s1_to_s9.zip"
 
     # Prefer the repository zip file if present, otherwise fallback to cache
-    if os.path.exists(repo_zip_path):
+    if repo_zip_path.exists():
         zip_path = repo_zip_path
     else:
         zip_path = cache_zip_path
 
     # Extract CSV if not present
-    if not os.path.exists(csv_path):
-        if not os.path.exists(zip_path):
+    if not csv_path.exists():
+        if not zip_path.exists():
             print(f"Zip file not found locally. Downloading from GitHub...")
             url = "https://github.com/ccb-hms/ProteinGymPy/blob/main/src/science.adg7492_data_s1_to_s9.zip?raw=true"
             try:
@@ -222,9 +226,9 @@ def get_alphamissense_proteingym_data(cache_dir: str = ".cache") -> pd.DataFrame
             except Exception as e:
                 print(f"Warning: Failed to download AlphaMissense data: {e}")
 
-        if os.path.exists(zip_path):
+        if zip_path.exists():
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                extracted_name = _extract_proteingym_csv(zip_ref, csv_path)
+                extracted_name = _extract_proteingym_csv(zip_ref, str(csv_path))
                 if extracted_name:
                     print(f"Extracted {extracted_name} from {zip_path} -> {csv_path}")
                 else:
