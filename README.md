@@ -75,7 +75,8 @@ supervised_data, summary = get_supervised_substitution_data("random_5")
 | `get_supervised_substitution_data()` | Load supervised model predictions for DMS subsitutions |
 | `get_zero_shot_substitution_data()` | Load zero-shot model predictions for DMS subsitutions |
 | `get_zero_shot_metrics()` | Load zero-shot benchmarking metrics |
-| `Load supervised model predictions for substitutions ()` | Get list of available supervised models |
+| `get_supervised_metrics()` | Load supervised benchmarking metrics |
+| `available_supervised_models()` | Get list of available supervised models |
 | `available_zero_shot_models()` | Get list of available zero-shot models |
 | `create_complete_metadata_table()` | Generate comprehensive metadata |
 | `benchmark_models()` | Benchmark multiple variant effect prediction models |
@@ -87,14 +88,6 @@ supervised_data, summary = get_supervised_substitution_data("random_5")
 
 ## Running Examples
 
-### Quick Demo (No Downloads)
-Run a simple demo to see available functions:
-```bash
-source .venv/bin/activate
-python demo.py
-```
-
-### Comprehensive Examples
 Run the full example script (includes data downloads):
 ```bash
 source .venv/bin/activate
@@ -135,8 +128,6 @@ uv sync --extra mkdocs
 uv run mkdocs build
 
 ```
-
-
 
 
 ## Citation
