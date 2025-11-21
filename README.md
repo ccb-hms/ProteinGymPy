@@ -20,10 +20,16 @@ To install the software, we recommend using [uv](https://docs.astral.sh/uv/#inst
 ```
 uv venv --python=3.13  #create a venv
 source .venv/bin/activate 
-uv pip install git+https://github.com/ccb-hms/ProteinGymPy.git#egg=ProteinGymPy
+uv pip install `ProteinGymPy`
 ```
 
 Addtional packages are required for jupyter notebook visualization functions:
+
+```
+uv pip install 'ProteinGymPy[visualization]`
+```
+
+To pull in the latest commits directly from github, use the following:
 
 ```
 uv pip install 'ProteinGymPy[visualization] @ git+https://github.com/ccb-hms/ProteinGymPy.git'
