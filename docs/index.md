@@ -18,7 +18,7 @@ uv pip install `ProteinGymPy`
 Addtional packages are required for jupyter notebook visualization functions:
 
 ```
-uv pip install 'ProteinGymPy[visualization]`
+uv pip install `ProteinGymPy[visualization]
 ```
 
 To pull in the latest commits directly from github, use the following:
