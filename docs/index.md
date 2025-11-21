@@ -68,7 +68,7 @@ supervised_data, summary = get_supervised_substitution_data("random_5")
 | [`get_supervised_substitution_data()`](reference/get_supervised_substitution_data.md) | Load supervised model predictions for DMS subsitutions |
 | [`get_zero_shot_substitution_data()`](reference/get_zero_shot_substitution_data.md) | Load zero-shot model predictions for DMS subsitutions |
 | [`get_zero_shot_metrics()`](reference/get_zero_shot_metrics.md) | Load zero-shot benchmarking metrics |
-| `get_supervised_metrics()`| Load supervised benchmarking metrics |
+| [`get_supervised_metrics()`](reference/get_supervised_metrics.md) | Load supervised benchmarking metrics |
 | [`available_supervised_models()`](reference/available_supervised_models.md) | Get list of available supervised models |
 | [`available_zero_shot_models()`](reference/available_zero_shot_models.md) | Get list of available zero-shot models |
 | [`create_complete_metadata_table()`](reference/create_complete_metadata_table.md) | Generate comprehensive metadata |
