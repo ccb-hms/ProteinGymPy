@@ -5,46 +5,45 @@ Downloads and processes ProteinGym zero-shot benchmarking metrics for DMS substi
 Handles 5 performance metrics: Spearman, AUC, MCC, NDCG, and Top_recall.
 """
 
-import os
 import pandas as pd
 import requests
-import tempfile
+from pathlib import Path
 import zipfile
 from typing import Dict, List, Optional, Any
 import numpy as np
 
+from .data_import_funcs import cached_download, get_cache_dir
 
-def get_zero_shot_metrics(cache_dir: str = ".cache") -> Dict[str, pd.DataFrame]:
+
+def get_zero_shot_metrics(cache_dir: str = None) -> Dict[str, pd.DataFrame]:
     """
     Download and process ProteinGym zero-shot benchmarking metrics.
-    
+
     This loads performance metrics for zero-shot models across 217 DMS assays.
     The benchmarking uses 5 metrics to evaluate model performance in predicting
     experimental DMS measurements without training on the specific assay labels.
-    
+
     Metrics included:
     1. Spearman's rank correlation coefficient (primary metric)
-    2. Area Under the ROC Curve (AUC) 
+    2. Area Under the ROC Curve (AUC)
     3. Matthews Correlation Coefficient (MCC) for bimodal measurements
     4. Normalized Discounted Cumulative Gains (NDCG) for identifying top variants
     5. Top K Recall (top 10% of DMS values)
-    
+
     Args:
-        cache_dir: Directory to cache downloaded files
-        
+        cache_dir: Directory to cache downloaded files (uses default if None)
+
     Returns:
         Dictionary with 5 entries (one per metric), each containing a DataFrame with:
         - Rows: 217 DMS assays
         - Columns: Model performance scores (79 models in v1.2)
     """
-    os.makedirs(cache_dir, exist_ok=True)
-    
     # Option 1: Load from GitHub (older approach with 62 models)
     # benchmark_data = _load_from_github()
-    
+
     # Option 2: Load from Zenodo v1.2 (79 models)
     benchmark_data = _load_from_zenodo_v12(cache_dir)
-    
+
     return benchmark_data
 
 
@@ -83,29 +82,23 @@ def _load_from_github() -> Dict[str, pd.DataFrame]:
     return score_list
 
 
-def _load_from_zenodo_v12(cache_dir: str) -> Dict[str, pd.DataFrame]:
+def _load_from_zenodo_v12(cache_dir: Optional[str]) -> Dict[str, pd.DataFrame]:
     """
     Load benchmark data from Zenodo v1.2 repository (79 models).
-    
+
     Args:
-        cache_dir: Directory to cache downloaded files
-        
+        cache_dir: Directory to cache downloaded files (uses default if None)
+
     Returns:
         Dictionary with 5 DataFrames for each metric
     """
-    zip_path = os.path.join(cache_dir, "DMS_benchmarks_performance.zip")
-    
-    if not os.path.exists(zip_path):
-        # URL from ProteinGym Zenodo v1.2
-        url = "https://zenodo.org/records/14997691/files/DMS_benchmark_performance.zip?download=1"
-        print(f"Downloading benchmarks from {url}...")
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-        with open(zip_path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-        print("Download complete.")
+    # Download using centralized caching utility
+    zip_path = cached_download(
+        url="https://zenodo.org/records/14997691/files/DMS_benchmark_performance.zip?download=1",
+        filename="DMS_benchmarks_performance.zip",
+        cache_dir=cache_dir,
+        use_cache=True
+    )
     
     # Extract and load benchmark files
     score_list = {}

@@ -5,26 +5,26 @@ Downloads and processes ProteinGym supervised model scores for DMS substitution 
 Handles contiguous_5, modulo_5, and random_5 fold types.
 """
 
-import os
 import pandas as pd
 import requests
-import tempfile
+from pathlib import Path
 import zipfile
 from typing import Dict, List, Optional, Tuple
-import re
+
+from .data_import_funcs import cached_download, get_cache_dir
 
 
 def get_supervised_substitution_data(
-    fold_type: str = "random_5", 
-    cache_dir: str = ".cache"
+    fold_type: str = "random_5",
+    cache_dir: str = None
 ) -> Tuple[Dict[str, pd.DataFrame], pd.DataFrame]:
     """
     Download and process raw ProteinGym supervised model substitution scores.
-    
+
     Args:
         fold_type: Type of cross-validation fold ("contiguous_5", "modulo_5", or "random_5")
-        cache_dir: Directory to cache downloaded files
-        
+        cache_dir: Directory to cache downloaded files (uses default if None)
+
     Returns:
         Tuple of (supervised_scores_dict, summary_metrics_df)
         - supervised_scores_dict: Dictionary mapping DMS assay names to DataFrames with model predictions
@@ -32,33 +32,25 @@ def get_supervised_substitution_data(
     """
     if fold_type not in ["contiguous_5", "modulo_5", "random_5"]:
         raise ValueError("fold_type must be one of: 'contiguous_5', 'modulo_5', 'random_5'")
-    
-    os.makedirs(cache_dir, exist_ok=True)
-    
-    # Download supervised scores data (this would need the actual URL from Zenodo v1.2)
-    zip_path = os.path.join(cache_dir, "DMS_supervised_substitutions_scores.zip")
-    
-    if not os.path.exists(zip_path):
-        url = "https://zenodo.org/records/14997691/files/DMS_supervised_substitutions_scores.zip?download=1"
-        print(f"Downloading supervised scores from {url}...")
-        
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-        with open(zip_path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-        print("Download complete.")
-    
+
+    # Download supervised scores data using centralized caching utility
+    zip_path = cached_download(
+        url="https://zenodo.org/records/14997691/files/DMS_supervised_substitutions_scores.zip?download=1",
+        filename="DMS_supervised_substitutions_scores.zip",
+        cache_dir=cache_dir,
+        use_cache=True
+    )
+
     # Check if we need to extract summary metrics
-    summary_path = os.path.join(cache_dir, "merged_scores_substitutions_DMS.csv")
-    if not os.path.exists(summary_path) and os.path.exists(zip_path):
+    cache_path = get_cache_dir(cache_dir)
+    summary_path = cache_path / "merged_scores_substitutions_DMS.csv"
+    if not summary_path.exists():
         try:
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 # Check if file exists in zip (at root or in subfolder)
                 target_file = "merged_scores_substitutions_DMS.csv"
                 if target_file in zip_ref.namelist():
-                    zip_ref.extract(target_file, cache_dir)
+                    zip_ref.extract(target_file, cache_path)
         except zipfile.BadZipFile:
             print(f"Warning: Could not read {zip_path} to extract summary metrics")
 
@@ -270,44 +262,29 @@ def _clean_supervised_column_names(supervised_tables: Dict[str, pd.DataFrame]) -
     return cleaned_tables
 
 
-def _load_from_zenodo_v12_supervised(cache_dir: str) -> pd.DataFrame:
+def _load_from_zenodo_v12_supervised(cache_dir: Optional[str]) -> pd.DataFrame:
     """
     Download and load the merged supervised DMS benchmark scores (Zenodo v1.2).
-    
+
     Steps:
       - Downloads the zip file containing DMS scores if not already cached.
       - Opens the ZIP and loads 'merged_scores_substitutions_DMS.csv'.
-    
+
     Args:
-        cache_dir (str): Directory where the ZIP file is stored or downloaded.
-    
+        cache_dir: Directory where the ZIP file is stored or downloaded (uses default if None)
+
     Returns:
         pandas.DataFrame: The merged scores table.
     """
-
-    url = (
-        "https://zenodo.org/records/14997691/files/"
-        "DMS_supervised_substitutions_scores.zip?download=1"
+    # Download using centralized caching utility
+    zip_path = cached_download(
+        url="https://zenodo.org/records/14997691/files/DMS_supervised_substitutions_scores.zip?download=1",
+        filename="DMS_supervised_substitutions_scores.zip",
+        cache_dir=cache_dir,
+        use_cache=True
     )
 
-    zip_path = os.path.join(cache_dir, "DMS_supervised_substitutions_scores.zip")
     target_file = "DMS_supervised_substitutions_scores/merged_scores_substitutions_DMS.csv"
-
-    # --------------------------------------------------------------
-    # 1. Download the ZIP if missing
-    # --------------------------------------------------------------
-    if not os.path.exists(zip_path):
-        print(f"Downloading benchmark ZIP from: {url}")
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-
-        os.makedirs(cache_dir, exist_ok=True)
-        with open(zip_path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-
-        print("Download complete.")
 
     # --------------------------------------------------------------
     # 2. Open ZIP and load the target CSV
@@ -327,28 +304,22 @@ def _load_from_zenodo_v12_supervised(cache_dir: str) -> pd.DataFrame:
     return df
 
 
-def get_supervised_metrics(cache_dir: str = ".cache") -> pd.DataFrame:
+def get_supervised_metrics(cache_dir: str = None) -> pd.DataFrame:
     """
     Load supervised DMS benchmark metrics (Zenodo v1.2).
-    
+
     This function:
       - Ensures the cache directory exists
       - Downloads the benchmark ZIP if missing
       - Loads 'merged_scores_substitutions_DMS.csv'
       - Returns it as a pandas DataFrame
-    
+
     Args:
-        cache_dir (str, optional): Directory to store or read cached files.
-                                   Defaults to ".cache".
-        
+        cache_dir: Directory to store or read cached files (uses default if None)
+
     Returns:
         pandas.DataFrame: The merged supervised benchmark scores.
     """
-
-    # Normalize and create cache directory if necessary
-    cache_dir = os.path.abspath(cache_dir)
-    os.makedirs(cache_dir, exist_ok=True)
-
     # Load merged scores via helper function
     benchmark_table = _load_from_zenodo_v12_supervised(cache_dir)
 

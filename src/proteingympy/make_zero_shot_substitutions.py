@@ -4,54 +4,43 @@ make_zero_shot_substitutions.py - Python equivalent of make_zero_shot_substituti
 Downloads and processes ProteinGym zero-shot model scores for DMS substitution assays.
 """
 
-import os
 import pandas as pd
 import requests
-import tempfile
+from pathlib import Path
 import zipfile
 from typing import Dict, List, Optional, Any
-import re
+
+from .data_import_funcs import cached_download, get_cache_dir
 
 
-def get_zero_shot_substitution_data(cache_dir: str = ".cache") -> Dict[str, pd.DataFrame]:
+def get_zero_shot_substitution_data(cache_dir: str = None) -> Dict[str, pd.DataFrame]:
     """
     Download and process ProteinGym zero-shot model scores for DMS substitutions.
-    
+
     This loads zero-shot model predictions across 217 DMS assays for multiple models.
     Each assay contains predictions from various protein language models and other
     zero-shot approaches.
-    
+
     Args:
-        cache_dir: Directory to cache downloaded files
-        
+        cache_dir: Directory to cache downloaded files (uses default if None)
+
     Returns:
         Dictionary mapping DMS assay names to DataFrames with columns:
         - UniProt_id: UniProt accession identifier
-        - DMS_id: DMS assay identifier  
+        - DMS_id: DMS assay identifier
         - mutant: substitution description
         - mutated_sequence: full amino acid sequence
         - DMS_score: experimental measurement
         - DMS_score_bin: binary fitness classification
         - [model_name]: Prediction scores from various zero-shot models
     """
-    os.makedirs(cache_dir, exist_ok=True)
-    
-    # Download zero-shot scores data
-    zip_path = os.path.join(cache_dir, "zero_shot_substitutions_scores.zip")
-    
-    if not os.path.exists(zip_path):
-        # URL from ProteinGym Zenodo v1.2
-        url = "https://zenodo.org/records/14997691/files/zero_shot_substitutions_scores.zip?download=1"
-        print(f"Downloading zero-shot scores from {url}...")
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-        with open(zip_path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-        print("Download complete.")
-    else:
-        print(f"Zero-shot scores found in cache at {zip_path}")
+    # Download zero-shot scores data using centralized caching utility
+    zip_path = cached_download(
+        url="https://zenodo.org/records/14997691/files/zero_shot_substitutions_scores.zip?download=1",
+        filename="zero_shot_substitutions_scores.zip",
+        cache_dir=cache_dir,
+        use_cache=True
+    )
     
     # Load zero-shot scores
     zeroshot_tables = _load_zero_shot_data(zip_path)
