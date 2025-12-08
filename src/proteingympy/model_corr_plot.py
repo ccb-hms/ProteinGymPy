@@ -355,12 +355,12 @@ def model_corr_plot(
     # Create figure with GridSpec for layout
     fig = plt.figure(figsize=figsize)
     gs = GridSpec(
-        3, 3,
+        4, 3,
         figure=fig,
-        hspace=0.05,
+        hspace=0.15,
         wspace=0.05,
         width_ratios=[1, 4, 0.3],
-        height_ratios=[1, 4, 0.5]
+        height_ratios=[1, 4, 0.3, 0.4]
     )
 
     # Main plot (center)
@@ -370,8 +370,8 @@ def model_corr_plot(
     ax_top = fig.add_subplot(gs[0, 1], sharex=ax_main)
     ax_right = fig.add_subplot(gs[1, 2], sharey=ax_main)
 
-    # Colorbar axis
-    ax_cbar = fig.add_subplot(gs[2, 1])
+    # Colorbar axis (row 3, below spacer row)
+    ax_cbar = fig.add_subplot(gs[3, 1])
 
     # Create hexbin plot
     x = merged_table['mean_model1'].values
