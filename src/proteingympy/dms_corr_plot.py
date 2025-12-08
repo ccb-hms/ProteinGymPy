@@ -168,7 +168,7 @@ def _get_model_dataframe(
     supervised_models = available_supervised_models()
 
     if model == "AlphaMissense":
-        print(f"Using AlphaMissense model from get_alphamissense_proteingym_data()")
+        print("Using AlphaMissense model from get_alphamissense_proteingym_data()")
         model_table = _filter_alphamissense_table(
             am_table=None,
             uniprot_id=uniprot_id,
